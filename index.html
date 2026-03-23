@@ -888,10 +888,15 @@ async function loadRecords() {
 
   try {
     const mk=monthKey();
-    const q=query(collection(db,'runs'),where('uid','==',currentUser.uid),where('month','==',mk),orderBy('createdAt','desc'));
+    const q=query(collection(db,'runs'),where('uid','==',currentUser.uid),where('month','==',mk));
     const snap=await getDocs(q);
     const runs=[];
     snap.forEach(d=>runs.push({id:d.id,...d.data()}));
+    runs.sort((a,b)=>{
+      const ta=a.createdAt?.toMillis?a.createdAt.toMillis():0;
+      const tb=b.createdAt?.toMillis?b.createdAt.toMillis():0;
+      return tb-ta;
+    });
 
     document.getElementById('p-total').textContent=runs.length;
 

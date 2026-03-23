@@ -719,7 +719,7 @@ function showAuthScreen() {
   document.getElementById('nav').classList.remove('show');
 }
 
-function enterApp() {
+async function enterApp() {
   const params = new URLSearchParams(location.search);
   const action = params.get('action');
 

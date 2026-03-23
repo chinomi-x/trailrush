@@ -1061,6 +1061,16 @@ async function loadHome() {
     const entries=Object.entries(bestMap).map(([uid,t])=>({uid,timeMs:t,...infoMap[uid],count:countMap[uid]}));
     entries.sort((a,b)=>a.timeMs-b.timeMs);
 
+    // Fetch photoURLs for top 5
+    const top5=entries.slice(0,5);
+    const photoMap={};
+    await Promise.all(top5.map(async e=>{
+      try {
+        const usnap=await getDoc(doc(db,'users',e.uid));
+        if(usnap.exists()&&usnap.data().photoURL) photoMap[e.uid]=usnap.data().photoURL;
+      } catch(err){}
+    }));
+
     document.getElementById('h-total').textContent=entries.length;
     document.getElementById('h-runs').textContent=totalRuns;
     document.getElementById('h-best').textContent=entries.length ? fmt(entries[0].timeMs):'--:--';
@@ -1070,12 +1080,15 @@ async function loadHome() {
     const list=document.getElementById('home-rank-list');
     if(!entries.length){ list.innerHTML='<div class="empty"><div class="ei">🐾</div>まだ記録がありません</div>'; return; }
 
-    list.innerHTML=entries.slice(0,5).map((e,i)=>{
+    list.innerHTML=top5.map((e,i)=>{
       const isMine=e.uid===currentUser.uid;
       const cls=`rc ${i===0?'r1':i===1?'r2':i===2?'r3':''} ${isMine?'mine':''}`;
+      const avHtml=photoMap[e.uid]
+        ? `<img src="${photoMap[e.uid]}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--fern);flex-shrink:0;">`
+        : `<div class="rc-av">🐾</div>`;
       return `<div class="${cls}" style="animation-delay:${i*.07}s">
         <div class="rc-pos">${i<3?medals[i]:i+1}</div>
-        <div class="rc-av">🐾</div>
+        ${avHtml}
         <div class="rc-info">
           <div class="rc-dog">${e.dog}${isMine?'<span class="you-tag">YOU</span>':''}</div>
           <div class="rc-owner">👤 ${e.name} ・ ${e.cat}</div>
@@ -1194,6 +1207,15 @@ async function loadRanking() {
     const entries=Object.entries(bestMap).map(([uid,t])=>({uid,timeMs:t,...infoMap[uid],count:countMap[uid]}));
     entries.sort((a,b)=>a.timeMs-b.timeMs);
 
+    // Fetch photoURLs for all entries
+    const photoMap={};
+    await Promise.all(entries.map(async e=>{
+      try {
+        const usnap=await getDoc(doc(db,'users',e.uid));
+        if(usnap.exists()&&usnap.data().photoURL) photoMap[e.uid]=usnap.data().photoURL;
+      } catch(err){}
+    }));
+
     const medals=['🥇','🥈','🥉'];
     const list=document.getElementById('rank-list');
     if(!entries.length){ list.innerHTML='<div class="empty"><div class="ei">🐾</div>まだ記録がありません</div>'; return; }
@@ -1201,9 +1223,12 @@ async function loadRanking() {
     list.innerHTML=entries.map((e,i)=>{
       const isMine=e.uid===currentUser.uid;
       const cls=`rc ${i===0?'r1':i===1?'r2':i===2?'r3':''} ${isMine?'mine':''}`;
+      const avHtml=photoMap[e.uid]
+        ? `<img src="${photoMap[e.uid]}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--fern);flex-shrink:0;">`
+        : `<div class="rc-av">🐾</div>`;
       return `<div class="${cls}" style="animation-delay:${i*.05}s">
         <div class="rc-pos">${i<3?medals[i]:i+1}</div>
-        <div class="rc-av">🐾</div>
+        ${avHtml}
         <div class="rc-info">
           <div class="rc-dog">${e.dog}${isMine?'<span class="you-tag">YOU</span>':''}</div>
           <div class="rc-owner">👤 ${e.name} ・ ${e.cat}</div>

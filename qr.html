@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRAIL RUSH - コースQR生成</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root {
+  --soil: #1c1208; --lime: #7eb832; --sun: #e8b020;
+  --ember: #d45f1a; --cream: #f0e8d0; --moss: #2d4a1e;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--soil); color: var(--cream);
+  min-height: 100vh; padding: 24px 16px 40px;
+  max-width: 500px; margin: 0 auto;
+}
+.logo {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900; font-size: 1.5rem; letter-spacing: 4px;
+  color: var(--lime); text-align: center; margin-bottom: 24px;
+}
+.logo em { color: var(--sun); font-style: normal; }
+
+.qr-card {
+border-radius: 16px; padding: 24px; text-align: center;
+margin-bottom: 20px;
+}
+.qr-card.start {
+background: linear-gradient(135deg, rgba(184,64,16,.2), rgba(212,95,26,.1));
+border: 2px solid var(–ember);
+}
+.qr-card.goal {
+background: linear-gradient(135deg, rgba(45,74,30,.3), rgba(74,124,53,.15));
+border: 2px solid var(–lime);
+}
+.qr-title {
+font-family: ‘Barlow Condensed’, sans-serif;
+font-weight: 900; font-size: 1.8rem; letter-spacing: 4px;
+margin-bottom: 6px;
+}
+.start .qr-title { color: var(–ember); }
+.goal .qr-title { color: var(–lime); }
+.qr-desc { font-size: .78rem; color: rgba(240,232,208,.6); margin-bottom: 16px; line-height: 1.6; }
+.qr-wrap {
+display: inline-block; padding: 12px;
+background: #f0e8d0; border-radius: 12px;
+margin-bottom: 12px;
+}
+.qr-url {
+font-size: .62rem; color: rgba(240,232,208,.4);
+word-break: break-all; margin-top: 8px;
+}
+
+.url-input {
+width: 100%; padding: 12px 14px;
+background: rgba(0,0,0,.4);
+border: 1.5px solid rgba(255,255,255,.15);
+border-radius: 9px; color: var(–cream);
+font-size: .9rem; outline: none; margin-bottom: 12px;
+-webkit-text-fill-color: var(–cream);
+}
+.gen-btn {
+width: 100%; padding: 13px;
+background: linear-gradient(135deg, #2d4a1e, var(–lime));
+border: none; border-radius: 10px;
+font-family: ‘Barlow Condensed’, sans-serif;
+font-weight: 700; font-size: 1.1rem; letter-spacing: 2px;
+color: #0a1a05; cursor: pointer; margin-bottom: 24px;
+}
+
+.print-btn {
+width: 100%; padding: 12px;
+background: rgba(255,255,255,.08);
+border: 1px solid rgba(255,255,255,.15);
+border-radius: 10px; color: var(–cream);
+font-size: .9rem; cursor: pointer; margin-top: 8px;
+}
+
+.hint-box {
+background: rgba(255,255,255,.04);
+border: 1px solid rgba(255,255,255,.1);
+border-radius: 12px; padding: 16px;
+font-size: .78rem; color: rgba(240,232,208,.6);
+line-height: 1.8; margin-bottom: 20px;
+}
+.hint-box strong { color: var(–sun); }
+
+@media print {
+body { background: white; color: black; padding: 0; }
+.no-print { display: none !important; }
+.qr-card { border: 2px solid #333; page-break-inside: avoid; margin-bottom: 30px; }
+.qr-title { color: #333 !important; }
+}
+</style>
+
+</head>
+<body>
+
+<div class="logo no-print">🐾 TRAIL<em>RUSH</em> — コースQR生成</div>
+
+<div class="hint-box no-print">
+  📌 <strong>使い方</strong><br>
+  ① 下の「QRを生成」ボタンを押す<br>
+  ② 生成されたQRを印刷する<br>
+  ③ スタート地点・ゴール地点の看板に貼る<br>
+  ④ 参加者がカメラアプリで読み取ると自動でタイム計測！
+</div>
+
+<div class="no-print">
+  <label style="font-size:.7rem;color:var(--sun);letter-spacing:1px;display:block;margin-bottom:6px;">アプリのURL（自動入力済み）</label>
+  <input type="text" class="url-input" id="app-url" placeholder="https://chinomi-x.github.io/trailrush/">
+  <button class="gen-btn" onclick="generateQRs()">🔲 QRコードを生成</button>
+</div>
+
+<!-- スタートQR -->
+
+<div class="qr-card start" id="start-card" style="display:none;">
+  <div class="qr-title">🏁 スタートQR</div>
+  <div class="qr-desc">コース入口の看板・ポールに貼ってください<br>参加者がこのQRをスキャンするとタイム計測が開始します</div>
+  <div class="qr-wrap"><div id="qr-start"></div></div>
+  <div class="qr-url" id="url-start"></div>
+</div>
+
+<!-- ゴールQR -->
+
+<div class="qr-card goal" id="goal-card" style="display:none;">
+  <div class="qr-title">🏆 ゴールQR</div>
+  <div class="qr-desc">ゴール地点の看板・ポールに貼ってください<br>参加者がこのQRをスキャンするとタイムが記録されます</div>
+  <div class="qr-wrap"><div id="qr-goal"></div></div>
+  <div class="qr-url" id="url-goal"></div>
+</div>
+
+<button class="print-btn no-print" id="print-btn" style="display:none;" onclick="window.print()">🖨️ 印刷する</button>
+
+<script>
+// アプリURLを自動設定
+const baseUrl = location.href.replace('qr.html','').replace(/\/$/, '');
+document.getElementById('app-url').value = baseUrl + '/';
+
+function generateQRs() {
+  const base = document.getElementById('app-url').value.trim().replace(/\/$/, '');
+  if(!base) { alert('URLを入力してください'); return; }
+
+  const startUrl = base + '/?action=start';
+  const goalUrl  = base + '/?action=goal';
+
+  // Clear previous
+  document.getElementById('qr-start').innerHTML = '';
+  document.getElementById('qr-goal').innerHTML  = '';
+
+  // Generate Start QR
+  new QRCode(document.getElementById('qr-start'), {
+    text: startUrl, width: 200, height: 200,
+    colorDark: '#1c1208', colorLight: '#f0e8d0'
+  });
+  document.getElementById('url-start').textContent = startUrl;
+  document.getElementById('start-card').style.display = 'block';
+
+  // Generate Goal QR
+  new QRCode(document.getElementById('qr-goal'), {
+    text: goalUrl, width: 200, height: 200,
+    colorDark: '#1c1208', colorLight: '#f0e8d0'
+  });
+  document.getElementById('url-goal').textContent = goalUrl;
+  document.getElementById('goal-card').style.display = 'block';
+
+  document.getElementById('print-btn').style.display = 'block';
+}
+
+// 自動生成
+window.onload = () => generateQRs();
+</script>
+
+</body>
+</html>

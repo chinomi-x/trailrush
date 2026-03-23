@@ -739,7 +739,12 @@ function enterApp() {
     // URLパラメータを消す
     history.replaceState(null,'',location.pathname);
   } else if(action === 'goal') {
-    // QRスキャン: ゴール処理
+    // QRスキャン: ゴール処理 - sessionStorageからスタート時刻を復元
+    const savedStart = sessionStorage.getItem('trailrush_start');
+    if(savedStart) {
+      startTs = parseInt(savedStart);
+      timerState = 'running';
+    }
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
     document.getElementById('screen-timer').classList.add('active');
     document.querySelectorAll('.ni').forEach((n,i)=>{n.classList.toggle('active',i===1);});
@@ -953,6 +958,8 @@ window.timerStart = () => {
   if(timerState==='running') { showToast('すでに走行中です！','info'); return; }
   if(timerState==='finished') { showToast('ゴール済みです。「もう一度走る」を押してください','info'); return; }
   timerState='running'; startTs=Date.now();
+  // スタート時刻をsessionStorageに保存（ゴールQR読取時に引き継ぐ）
+  sessionStorage.setItem('trailrush_start', String(startTs));
   document.getElementById('t-label').textContent='走行中 🏃🐾';
   document.getElementById('t-display').classList.add('running');
   document.getElementById('s-wait').className='step done';
@@ -1022,6 +1029,7 @@ window.timerGoal = async () => {
 
 window.resetTimer = () => {
   timerState='wait'; startTs=null; clearInterval(timerIv);
+  sessionStorage.removeItem('trailrush_start');
   document.getElementById('t-display').textContent='00:00.0';
   document.getElementById('t-display').className='timer-num';
   document.getElementById('t-label').textContent='準備完了';

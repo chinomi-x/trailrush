@@ -745,12 +745,15 @@ async function enterApp() {
     try {
       const snap = await getDoc(doc(db, 'active_runs', currentUser.uid));
       if(snap.exists() && snap.data().status === 'running') {
-        startTs = snap.data().startTs;
+        // Firestoreから取得した値を確実に数値に変換
+        const rawTs = snap.data().startTs;
+        startTs = typeof rawTs === 'number' ? rawTs : Number(rawTs);
         timerState = 'running';
         // タイマー表示を更新
         document.getElementById('t-display').classList.add('running');
         document.getElementById('s-wait').className='step done';
         document.getElementById('s-run').className='step cur';
+        document.getElementById('t-display').textContent = fmt(Date.now() - startTs);
       }
     } catch(e) { console.error('restore error:', e); }
     timerGoal();
@@ -971,7 +974,7 @@ window.timerStart = async () => {
   try {
     await setDoc(doc(db, 'active_runs', currentUser.uid), {
       uid: currentUser.uid,
-      startTs: startTs,
+      startTs: Number(startTs),
       status: 'running',
       updatedAt: serverTimestamp()
     });

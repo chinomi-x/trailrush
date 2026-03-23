@@ -476,9 +476,17 @@ font-size:.82rem;cursor:pointer;transition:all .2s;
     <div class="step" id="s-run"><div class="step-dot">🏃</div><div class="step-l">走行中</div></div>
     <div class="step" id="s-fin"><div class="step-dot">🎉</div><div class="step-l">完走</div></div>
   </div>
-  <div class="action-wrap">
-    <button class="abtn abtn-start" id="btn-start" onclick="timerStart()">🏁 スタート</button>
-    <button class="abtn abtn-off" id="btn-goal" onclick="timerGoal()" disabled>🏆 ゴール</button>
+  <div id="qr-instruction" style="padding:16px;">
+    <div id="qr-hint-start" style="background:linear-gradient(135deg,rgba(184,64,16,.2),rgba(212,95,26,.1));border:1px solid rgba(212,95,26,.4);border-radius:14px;padding:22px;text-align:center;">
+      <div style="font-size:3rem;margin-bottom:10px;">📷</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.2rem;letter-spacing:2px;color:var(--ember);margin-bottom:8px;">スタート地点のQRを読み取ってください</div>
+      <div style="font-size:.78rem;color:var(--fog);line-height:1.7;">スマホの標準カメラアプリでコース入口のQRコードをスキャンするとタイム計測が始まります</div>
+    </div>
+    <div id="qr-hint-goal" style="display:none;background:linear-gradient(135deg,rgba(45,74,30,.3),rgba(74,124,53,.15));border:1px solid rgba(126,184,50,.4);border-radius:14px;padding:22px;text-align:center;">
+      <div style="font-size:3rem;margin-bottom:10px;">📷</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.2rem;letter-spacing:2px;color:var(--lime);margin-bottom:8px;">ゴール地点のQRを読み取ってください</div>
+      <div style="font-size:.78rem;color:var(--fog);line-height:1.7;">ゴール地点のQRコードをスキャンするとタイムが記録されます</div>
+    </div>
   </div>
   <div class="finish-box" id="finish-box">
     <div class="fb-title">🎉 GOAL!</div>
@@ -496,17 +504,34 @@ font-size:.82rem;cursor:pointer;transition:all .2s;
     <div class="wm">TRAIL<em>RUSH</em></div>
     <div style="font-size:.68rem;color:var(--fog);letter-spacing:2px;">自分の記録</div>
   </div>
+
+  <!-- Profile hero -->
+
   <div class="prof-hero">
-    <div class="prof-av">🐾</div>
+    <div class="prof-av" id="p-av-wrap" onclick="document.getElementById('photo-input').click()" style="cursor:pointer;position:relative;">
+      <img id="p-av-img" src="" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:none;">
+      <span id="p-av-emoji">🐾</span>
+      <div style="position:absolute;bottom:0;right:0;background:var(--lime);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:.7rem;">✏️</div>
+    </div>
+    <input type="file" id="photo-input" accept="image/*" style="display:none;" onchange="uploadPhoto(this)">
     <div class="prof-dog" id="p-dog">-</div>
     <div class="prof-owner" id="p-owner">-</div>
     <div class="prof-cat" id="p-cat">-</div>
+    <div style="margin-top:10px;">
+      <button onclick="openEdit()" style="background:rgba(126,184,50,.15);border:1px solid rgba(126,184,50,.3);color:var(--lime);padding:6px 18px;border-radius:20px;font-size:.72rem;cursor:pointer;letter-spacing:1px;">✏️ プロフィール編集</button>
+    </div>
   </div>
+
+  <!-- Stats -->
+
   <div class="prof-stats">
     <div class="ps"><div class="ps-n" id="p-total">0</div><div class="ps-l">総走行</div></div>
     <div class="ps"><div class="ps-n" id="p-best" style="color:var(--sun);font-size:1.1rem;">--:--</div><div class="ps-l">自己ベスト</div></div>
     <div class="ps"><div class="ps-n" id="p-rank">-</div><div class="ps-l">今月順位</div></div>
   </div>
+
+  <!-- Records list -->
+
   <div class="sec" style="margin-top:14px;">
     <div class="sec-head">
       <div class="sec-title">📊 走行記録</div>
@@ -515,6 +540,51 @@ font-size:.82rem;cursor:pointer;transition:all .2s;
     <div id="rec-list"><div class="empty"><div class="ei">🐾</div>まだ記録がありません</div></div>
   </div>
   <button class="logout-btn" onclick="doLogout()">ログアウト</button>
+</div>
+
+<!-- ══ EDIT MODAL ══ -->
+
+<div id="edit-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);overflow-y:auto;">
+  <div style="background:#1c1208;border:1px solid rgba(126,184,50,.2);border-radius:20px 20px 0 0;padding:24px 16px 40px;margin-top:60px;min-height:calc(100vh - 60px);max-width:430px;margin-left:auto;margin-right:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.2rem;letter-spacing:3px;color:var(--lime);">✏️ プロフィール編集</div>
+      <button onclick="closeEdit()" style="background:rgba(255,255,255,.08);border:none;color:var(--cream);width:32px;height:32px;border-radius:50%;font-size:1.1rem;cursor:pointer;">✕</button>
+    </div>
+
+```
+<div class="err-msg" id="err-edit"></div>
+
+<div style="font-size:.7rem;letter-spacing:2px;color:var(--sun);text-transform:uppercase;margin-bottom:14px;">🐾 犬・オーナー情報</div>
+
+<div class="field"><label>🐾 犬の名前 ※必須</label><input type="text" id="e-dog" placeholder="ポチ"></div>
+<div class="field"><label>👤 オーナー名（任意）</label><input type="text" id="e-name" placeholder="田中 太郎"></div>
+<div class="field">
+  <label>カテゴリ</label>
+  <select id="e-cat">
+    <option value="総合">総合</option>
+    <option value="小型犬">小型犬（〜10kg）</option>
+    <option value="中型犬">中型犬（10〜25kg）</option>
+    <option value="大型犬">大型犬（25kg〜）</option>
+  </select>
+</div>
+
+<div style="height:1px;background:rgba(255,255,255,.08);margin:16px 0;"></div>
+<div style="font-size:.7rem;letter-spacing:2px;color:var(--sun);text-transform:uppercase;margin-bottom:14px;">🔐 ログイン情報</div>
+
+<div class="field"><label>メールアドレス</label><input type="email" id="e-email" placeholder="example@mail.com"></div>
+<div class="field">
+  <label>新しいパスワード（変更する場合のみ）</label>
+  <input type="password" id="e-pass" placeholder="6文字以上（変更しない場合は空欄）">
+</div>
+<div class="field">
+  <label>現在のパスワード（メール・パスワード変更時に必要）</label>
+  <input type="password" id="e-current-pass" placeholder="現在のパスワード">
+</div>
+
+<button class="sbtn" id="btn-save" onclick="saveProfile()" style="margin-top:8px;">変更を保存</button>
+```
+
+  </div>
 </div>
 
 <!-- ══ RANKING ══ -->
@@ -557,7 +627,9 @@ font-size:.82rem;cursor:pointer;transition:all .2s;
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, doc, setDoc, getDoc, addDoc, query, where, orderBy, getDocs, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, addDoc, query, where, orderBy, getDocs, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { updateEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 // ── Firebase Config ──
 const firebaseConfig = {
@@ -570,9 +642,10 @@ const firebaseConfig = {
   measurementId: "G-NDBHVQ8VS2"
 };
 
-const app  = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db   = getFirestore(app);
+const app     = initializeApp(firebaseConfig);
+const auth    = getAuth(app);
+const db      = getFirestore(app);
+const storage = getStorage(app);
 
 // ── State ──
 let currentUser = null;
@@ -648,14 +721,147 @@ function showAuthScreen() {
 }
 
 function enterApp() {
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('screen-home').classList.add('active');
+  const params = new URLSearchParams(location.search);
+  const action = params.get('action');
+
   document.getElementById('nav').classList.add('show');
-  document.querySelectorAll('.ni').forEach((n,i)=>{n.classList.toggle('active',i===0);});
   updateTimerUI();
   loadHome();
   loadRecords();
   loadRanking();
+
+  if(action === 'start') {
+    // QRスキャン: スタート処理
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById('screen-timer').classList.add('active');
+    document.querySelectorAll('.ni').forEach((n,i)=>{n.classList.toggle('active',i===1);});
+    timerStart();
+    // URLパラメータを消す
+    history.replaceState(null,'',location.pathname);
+  } else if(action === 'goal') {
+    // QRスキャン: ゴール処理
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById('screen-timer').classList.add('active');
+    document.querySelectorAll('.ni').forEach((n,i)=>{n.classList.toggle('active',i===1);});
+    timerGoal();
+    history.replaceState(null,'',location.pathname);
+  } else {
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById('screen-home').classList.add('active');
+    document.querySelectorAll('.ni').forEach((n,i)=>{n.classList.toggle('active',i===0);});
+  }
+}
+
+// ── Profile Edit ──
+window.openEdit = () => {
+  if(!userProfile) return;
+  document.getElementById('e-dog').value  = userProfile.dog  || '';
+  document.getElementById('e-name').value = userProfile.name === 'オーナー' ? '' : (userProfile.name || '');
+  document.getElementById('e-cat').value  = userProfile.cat  || '総合';
+  document.getElementById('e-email').value = currentUser.email || '';
+  document.getElementById('e-pass').value = '';
+  document.getElementById('e-current-pass').value = '';
+  document.getElementById('err-edit').style.display = 'none';
+  document.getElementById('edit-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+};
+
+window.closeEdit = () => {
+  document.getElementById('edit-modal').style.display = 'none';
+  document.body.style.overflow = '';
+};
+
+window.saveProfile = async () => {
+  const dog         = document.getElementById('e-dog').value.trim();
+  const name        = document.getElementById('e-name').value.trim() || 'オーナー';
+  const cat         = document.getElementById('e-cat').value;
+  const email       = document.getElementById('e-email').value.trim();
+  const newPass     = document.getElementById('e-pass').value;
+  const currentPass = document.getElementById('e-current-pass').value;
+  const errEl       = document.getElementById('err-edit');
+  const btn         = document.getElementById('btn-save');
+
+  errEl.style.display = 'none';
+  if(!dog) { errEl.textContent = '🐾 犬の名前を入力してください'; errEl.style.display = 'block'; return; }
+
+  const emailChanged = email !== currentUser.email;
+  const passChanged  = newPass.length > 0;
+
+  if((emailChanged || passChanged) && !currentPass) {
+    errEl.textContent = 'メールまたはパスワードを変更する場合は現在のパスワードを入力してください';
+    errEl.style.display = 'block'; return;
+  }
+
+  btn.disabled = true; btn.textContent = '保存中...';
+
+  try {
+    // Re-authenticate if needed
+    if(emailChanged || passChanged) {
+      const credential = EmailAuthProvider.credential(currentUser.email, currentPass);
+      await reauthenticateWithCredential(currentUser, credential);
+    }
+
+    // Update email
+    if(emailChanged) await updateEmail(currentUser, email);
+
+    // Update password
+    if(passChanged) {
+      if(newPass.length < 6) { errEl.textContent = 'パスワードは6文字以上にしてください'; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = '変更を保存'; return; }
+      await updatePassword(currentUser, newPass);
+    }
+
+    // Update Firestore profile
+    await updateDoc(doc(db, 'users', currentUser.uid), { dog, name, cat, email });
+    userProfile = { ...userProfile, dog, name, cat, email };
+
+    closeEdit();
+    updateTimerUI();
+    loadRecords();
+    showToast('✅ プロフィールを更新しました！');
+  } catch(e) {
+    const msgs = {
+      'auth/wrong-password': '現在のパスワードが正しくありません',
+      'auth/email-already-in-use': 'このメールアドレスは既に使用されています',
+      'auth/invalid-email': 'メールアドレスの形式が正しくありません',
+      'auth/requires-recent-login': '再ログインが必要です。一度ログアウトして再度ログインしてください',
+    };
+    errEl.textContent = msgs[e.code] || 'エラー: ' + e.message;
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = '変更を保存';
+  }
+};
+
+// ── Photo Upload ──
+window.uploadPhoto = async (input) => {
+  const file = input.files[0];
+  if(!file) return;
+  if(file.size > 5 * 1024 * 1024) { showToast('画像は5MB以下にしてください','err'); return; }
+
+  showToast('アップロード中...','info');
+  try {
+    const storageRef = ref(storage, `avatars/${currentUser.uid}`);
+    await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(storageRef);
+    await updateDoc(doc(db, 'users', currentUser.uid), { photoURL: url });
+    userProfile.photoURL = url;
+    updateAvatarUI(url);
+    showToast('📸 写真を更新しました！');
+  } catch(e) {
+    showToast('アップロードに失敗しました','err');
+    console.error(e);
+  }
+};
+
+function updateAvatarUI(url) {
+  if(!url) return;
+  const img   = document.getElementById('p-av-img');
+  const emoji = document.getElementById('p-av-emoji');
+  if(img && emoji) {
+    img.src = url;
+    img.style.display = 'block';
+    emoji.style.display = 'none';
+  }
 }
 
 // ── Auth Tab ──
@@ -744,22 +950,26 @@ window.goScreen = (name, el) => {
 
 // ── Timer ──
 window.timerStart = () => {
-  if(timerState!=='wait') return;
+  if(timerState==='running') { showToast('すでに走行中です！','info'); return; }
+  if(timerState==='finished') { showToast('ゴール済みです。「もう一度走る」を押してください','info'); return; }
   timerState='running'; startTs=Date.now();
   document.getElementById('t-label').textContent='走行中 🏃🐾';
   document.getElementById('t-display').classList.add('running');
-  document.getElementById('btn-start').className='abtn abtn-off'; document.getElementById('btn-start').disabled=true;
-  document.getElementById('btn-goal').className='abtn abtn-goal'; document.getElementById('btn-goal').disabled=false;
   document.getElementById('s-wait').className='step done';
   document.getElementById('s-run').className='step cur';
+  document.getElementById('qr-hint-start').style.display='none';
+  document.getElementById('qr-hint-goal').style.display='block';
   timerIv=setInterval(()=>{ document.getElementById('t-display').textContent=fmt(Date.now()-startTs); },100);
-  showToast('🏁 スタート！');
+  showToast('🏁 スタート！走れ！');
 };
 
 window.timerGoal = async () => {
-  if(timerState!=='running') return;
+  if(timerState==='wait') { showToast('先にスタートQRを読み取ってください','err'); return; }
+  if(timerState==='finished') { showToast('ゴール済みです。「もう一度走る」を押してください','info'); return; }
   timerState='finished';
   clearInterval(timerIv);
+  document.getElementById('qr-hint-goal').style.display='none';
+  document.getElementById('qr-instruction').style.display='none';
   const elapsed=Date.now()-startTs;
   const timeStr=fmt(elapsed);
 
@@ -815,12 +1025,13 @@ window.resetTimer = () => {
   document.getElementById('t-display').textContent='00:00.0';
   document.getElementById('t-display').className='timer-num';
   document.getElementById('t-label').textContent='準備完了';
-  document.getElementById('btn-start').className='abtn abtn-start'; document.getElementById('btn-start').disabled=false;
-  document.getElementById('btn-goal').className='abtn abtn-off'; document.getElementById('btn-goal').disabled=true;
   document.getElementById('s-wait').className='step cur';
   document.getElementById('s-run').className='step';
   document.getElementById('s-fin').className='step';
   document.getElementById('finish-box').classList.remove('show');
+  document.getElementById('qr-instruction').style.display='block';
+  document.getElementById('qr-hint-start').style.display='block';
+  document.getElementById('qr-hint-goal').style.display='none';
 };
 
 function updateTimerUI() {
@@ -882,9 +1093,10 @@ async function loadHome() {
 async function loadRecords() {
   if(!currentUser||!userProfile) return;
   document.getElementById('p-dog').textContent=userProfile.dog;
-  document.getElementById('p-owner').textContent=`👤 ${userProfile.name}`;
+  document.getElementById('p-owner').textContent=userProfile.name && userProfile.name !== 'オーナー' ? `👤 ${userProfile.name}` : '';
   document.getElementById('p-cat').textContent=userProfile.cat;
   document.getElementById('rec-month-tag').textContent=monthLabel();
+  if(userProfile.photoURL) updateAvatarUI(userProfile.photoURL);
 
   try {
     const mk=monthKey();

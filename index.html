@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>TRAIL RUSH 🐾</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --soil:  #1c1208;
+  --bark:  #2a1f0e;
+  --moss:  #2d4a1e;
+  --fern:  #4a7c35;
+  --lime:  #7eb832;
+  --sun:   #e8b020;
+  --ember: #d45f1a;
+  --red:   #c03020;
+  --sky:   #4a9ec4;
+  --cream: #f0e8d0;
+  --fog:   rgba(240,232,208,0.5);
+  --fog2:  rgba(240,232,208,0.12);
+  --r: 13px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{
+  font-family:'Noto Sans JP',sans-serif;
+  background:var(--soil); color:var(--cream);
+  min-height:100vh; max-width:430px; margin:0 auto;
+  overflow-x:hidden; position:relative;
+}
+body::before{
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+/* ── Screens ── */
+.screen{display:none;position:relative;z-index:1;min-height:100vh;padding-bottom:84px;animation:fadeUp .3s ease;}
+.screen.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Loading ── */
+#loading{
+position:fixed;inset:0;background:var(–soil);
+display:flex;flex-direction:column;align-items:center;justify-content:center;
+z-index:9999;transition:opacity .5s;
+}
+#loading.hide{opacity:0;pointer-events:none;}
+.loading-logo{
+font-family:‘Barlow Condensed’,sans-serif;
+font-weight:900;font-size:3rem;letter-spacing:6px;color:var(–lime);
+text-shadow:0 0 30px rgba(126,184,50,.5);animation:pulse 1.5s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.loading-sub{font-size:.75rem;color:var(–fog);letter-spacing:3px;margin-top:8px;}
+
+/* ── Bottom Nav ── */
+.nav{
+position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+width:100%;max-width:430px;
+background:linear-gradient(0deg,rgba(14,10,4,.98) 70%,transparent);
+padding:8px 0 22px;
+display:none;justify-content:space-around;z-index:200;
+}
+.nav.show{display:flex;}
+.ni{
+display:flex;flex-direction:column;align-items:center;gap:3px;
+cursor:pointer;padding:6px 16px;border-radius:10px;
+transition:all .2s;color:rgba(240,232,208,.3);
+font-size:.58rem;letter-spacing:1px;text-transform:uppercase;
+}
+.ni.active{color:var(–lime);}
+.ni-icon{font-size:1.35rem;}
+
+/* ── Topbar ── */
+.topbar{
+position:sticky;top:0;z-index:100;
+padding:13px 18px 11px;
+display:flex;align-items:center;justify-content:space-between;
+background:linear-gradient(180deg,var(–soil) 55%,transparent);
+}
+.wm{
+font-family:‘Barlow Condensed’,sans-serif;
+font-weight:900;font-size:1.5rem;letter-spacing:4px;color:var(–lime);
+text-shadow:0 0 20px rgba(126,184,50,.4);
+}
+.wm em{color:var(–sun);font-style:normal;}
+
+/* ── Cards & Sections ── */
+.card{
+background:rgba(255,255,255,.045);
+border:1px solid rgba(255,255,255,.08);
+border-radius:var(–r);padding:16px;margin-bottom:10px;
+}
+.sec{padding:16px 16px 4px;}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.sec-title{
+font-family:‘Barlow Condensed’,sans-serif;
+font-weight:700;font-size:1.05rem;letter-spacing:3px;color:var(–lime);text-transform:uppercase;
+}
+
+/* ── Auth Screen ── */
+.auth-hero{
+height:210px;
+background:linear-gradient(160deg,var(–moss) 0%,var(–bark) 100%);
+display:flex;flex-direction:column;align-items:center;justify-content:center;
+text-align:center;position:relative;overflow:hidden;
+}
+.auth-hero::before{
+content:‘🌲🐾🌲’;font-size:2.5rem;
+position:absolute;bottom:8px;letter-spacing:10px;opacity:.15;
+}
+.auth-logo{
+font-family:‘Barlow Condensed’,sans-serif;
+font-weight:900;font-size:3rem;letter-spacing:6px;
+color:var(–lime);text-shadow:0 0 28px rgba(126,184,50,.5);line-height:1;
+}
+.auth-tag{font-size:.72rem;color:var(–fog);letter-spacing:2px;margin-top:6px;}
+
+.auth-tabs{
+display:flex;margin:18px 16px 0;
+background:rgba(255,255,255,.05);border-radius:10px;padding:4px;gap:4px;
+}
+.atab{
+flex:1;padding:9px;text-align:center;
+font-family:‘Barlow Condensed’,sans-serif;font-weight:600;
+font-size:.88rem;letter-spacing:2px;cursor:pointer;
+border-radius:7px;transition:all .2s;color:var(–fog);
+}
+.atab.active{background:var(–fern);color:var(–cream);}
+
+.auth-form{padding:16px;}
+.field{margin-bottom:11px;}
+.field label{
+display:block;font-size:.63rem;letter-spacing:1.5px;
+color:var(–sun);text-transform:uppercase;margin-bottom:5px;
+}
+.field input,.field select{
+width:100%;padding:12px 14px;
+background:rgba(0,0,0,.45);
+border:1.5px solid rgba(255,255,255,.12);
+border-radius:9px;color:var(–cream);
+font-size:.95rem;font-family:‘Noto Sans JP’,sans-serif;
+outline:none;transition:border-color .2s;
+}
+.field input:focus,.field select:focus{border-color:var(–lime);}
+.field select option{background:#1c1208;}
+.field .hint{font-size:.62rem;color:var(–fog);margin-top:3px;}
+
+.sbtn{
+width:100%;padding:14px;
+background:linear-gradient(135deg,var(–moss),var(–lime));
+border:none;border-radius:var(–r);
+font-family:‘Barlow Condensed’,sans-serif;
+font-weight:700;font-size:1.15rem;letter-spacing:3px;
+color:#0a1a05;cursor:pointer;transition:all .2s;
+box-shadow:0 6px 22px rgba(126,184,50,.28);
+}
+.sbtn:active{transform:scale(.97);}
+.sbtn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+.err-msg{
+background:rgba(192,48,32,.15);border:1px solid rgba(192,48,32,.3);
+border-radius:8px;padding:10px 14px;
+font-size:.78rem;color:#ff8878;margin-bottom:10px;display:none;
+}
+
+/* ── Hero Banner ── */
+.hero{
+position:relative;height:190px;
+background:linear-gradient(135deg,var(–moss) 0%,#1a3010 50%,var(–bark) 100%);
+overflow:hidden;
+}
+.hero-trees{
+position:absolute;bottom:0;left:0;right:0;height:110px;
+background:url(“data:image/svg+xml,%3Csvg xmlns=‘http://www.w3.org/2000/svg’ viewBox=‘0 0 430 110’%3E%3Cpolygon points=‘0,110 38,38 76,110’ fill=’%231a3010’/%3E%3Cpolygon points=‘28,110 68,18 108,110’ fill=’%232d4a1e’/%3E%3Cpolygon points=‘78,110 118,32 158,110’ fill=’%231a3010’/%3E%3Cpolygon points=‘138,110 178,14 218,110’ fill=’%232d4a1e’/%3E%3Cpolygon points=‘198,110 238,28 278,110’ fill=’%231a3010’/%3E%3Cpolygon points=‘258,110 298,22 338,110’ fill=’%232d4a1e’/%3E%3Cpolygon points=‘308,110 358,8 408,110’ fill=’%231a3010’/%3E%3Cpolygon points=‘368,110 408,32 430,110’ fill=’%232d4a1e’/%3E%3C/svg%3E”) bottom/cover no-repeat;
+}
+.hero-content{
+position:absolute;inset:0;
+display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+}
+.hero-month{font-family:‘Barlow Condensed’,sans-serif;font-size:.72rem;letter-spacing:4px;color:var(–sun);text-transform:uppercase;margin-bottom:4px;}
+.hero-title{font-family:‘Barlow Condensed’,sans-serif;font-weight:900;font-size:2.2rem;letter-spacing:3px;line-height:1;color:var(–cream);text-shadow:0 2px 14px rgba(0,0,0,.8);}
+.hero-sub{font-size:.7rem;color:rgba(240,232,208,.6);margin-top:6px;letter-spacing:1px;}
+
+/* ── Stats ── */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px 14px;}
+.stat{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:11px 6px;text-align:center;}
+.stat-n{font-family:‘Barlow Condensed’,sans-serif;font-weight:700;font-size:1.8rem;line-height:1;color:var(–lime);}
+.stat-l{font-size:.58rem;color:var(–fog);letter-spacing:1px;text-transform:uppercase;margin-top:3px;}
+
+/* ── Rank Cards ── */
+.rank-list{display:flex;flex-direction:column;gap:7px;}
+.rc{
+display:flex;align-items:center;gap:11px;
+padding:11px 13px;
+background:rgba(255,255,255,.04);
+border:1px solid rgba(255,255,255,.07);
+border-left:3px solid transparent;
+border-radius:var(–r);
+animation:slideIn .35s ease both;
+}
+.rc.r1{border-left-color:var(–sun);background:rgba(232,176,32,.06);}
+.rc.r2{border-left-color:#9ab0b8;}
+.rc.r3{border-left-color:#a07850;}
+.rc.mine{border-color:rgba(232,176,32,.4);background:rgba(232,176,32,.06);}
+@keyframes slideIn{from{transform:translateX(-12px);opacity:0}to{transform:translateX(0);opacity:1}}
+.rc-pos{font-family:‘Barlow Condensed’,sans-serif;font-weight:900;font-size:1.9rem;min-width:30px;text-align:center;line-height:1;color:rgba(240,232,208,.25);}
+.r1 .rc-pos{color:var(–sun);}
+.r2 .rc-pos{color:#9ab0b8;}
+.r3 .rc-pos{color:#a07850;}
+.mine .rc-pos{color:var(–sun);}
+.rc-av{width:36px;height:36px;border-radius:50%;background:var(–moss);border:2px solid var(–fern);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.rc-info{flex:1;min-width:0;}
+.rc-dog{font-weight:700;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rc-owner{font-size:.67rem;color:var(–fog);margin-top:1px;}
+.rc-right{text-align:right;flex-shrink:0;}
+.rc-time{font-family:‘Barlow Condensed’,sans-serif;font-weight:700;font-size:1.2rem;color:var(–lime);letter-spacing:1px;}
+.rc-count{font-size:.6rem;color:var(–fog);margin-top:1px;}
+.you-tag{font-size:.58rem;color:var(–sun);background:rgba(232,176,32,.15);padding:1px 6px;border-radius:8px;margin-left:4px;}
+
+/* ── Timer ── */
+.timer-hero{
+background:linear-gradient(160deg,var(–bark) 0%,var(–moss) 100%);
+padding:28px 20px 24px;text-align:center;position:relative;overflow:hidden;
+}
+.timer-hero::after{
+content:’’;position:absolute;inset:0;pointer-events:none;
+background:radial-gradient(ellipse at 50% 120%,rgba(126,184,50,.18),transparent 60%);
+}
+.timer-label{font-family:‘Barlow Condensed’,sans-serif;font-size:.7rem;letter-spacing:4px;color:var(–sun);text-transform:uppercase;margin-bottom:6px;}
+.timer-num{
+font-family:‘Barlow Condensed’,sans-serif;font-weight:900;
+font-size:5rem;letter-spacing:3px;line-height:1;color:var(–cream);
+text-shadow:0 0 36px rgba(126,184,50,.3);transition:color .4s;
+}
+.timer-num.running{color:var(–lime);text-shadow:0 0 36px rgba(126,184,50,.7);}
+.timer-num.done{color:var(–sun);text-shadow:0 0 36px rgba(232,176,32,.7);}
+
+.user-card{
+margin:14px 16px 0;
+background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+border-radius:var(–r);padding:13px 15px;
+display:flex;align-items:center;gap:12px;
+}
+.uc-av{width:44px;height:44px;border-radius:50%;background:var(–moss);border:2px solid var(–fern);display:flex;align-items:center;justify-content:center;font-size:1.5rem;}
+.uc-info{flex:1;}
+.uc-dog{font-weight:700;font-size:.98rem;}
+.uc-sub{font-size:.7rem;color:var(–fog);margin-top:2px;}
+.uc-best{text-align:right;}
+.uc-best-l{font-size:.56rem;color:var(–fog);}
+.uc-best-v{font-family:‘Barlow Condensed’,sans-serif;font-weight:700;font-size:1.1rem;color:var(–sun);}
+
+/* Steps */
+.steps{display:flex;align-items:center;justify-content:center;padding:14px 20px 0;margin:0 16px;}
+.step{flex:1;text-align:center;position:relative;}
+.step::after{content:’’;position:absolute;top:13px;left:50%;right:-50%;height:2px;background:rgba(255,255,255,.08);z-index:0;}
+.step:last-child::after{display:none;}
+.step-dot{
+width:26px;height:26px;border-radius:50%;
+background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.13);
+display:flex;align-items:center;justify-content:center;
+font-size:.8rem;margin:0 auto 4px;position:relative;z-index:1;transition:all .3s;
+}
+.step.done .step-dot{background:var(–lime);border-color:var(–lime);}
+.step.cur .step-dot{background:var(–ember);border-color:var(–ember);box-shadow:0 0 10px rgba(212,95,26,.5);}
+.step-l{font-size:.56rem;letter-spacing:1px;color:var(–fog);text-transform:uppercase;}
+.step.done .step-l,.step.cur .step-l{color:var(–cream);}
+
+/* Action buttons */
+.action-wrap{padding:14px 16px;display:flex;flex-direction:column;gap:9px;}
+.abtn{
+width:100%;padding:17px;border:none;border-radius:var(–r);
+font-family:‘Barlow Condensed’,sans-serif;font-weight:700;font-size:1.35rem;letter-spacing:3px;
+cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.abtn:active{transform:scale(.97);}
+.abtn-start{background:linear-gradient(135deg,#b84010,var(–ember));color:#fff;box-shadow:0 6px 24px rgba(212,95,26,.32);}
+.abtn-goal{background:linear-gradient(135deg,var(–moss),var(–lime));color:#0a1a05;box-shadow:0 6px 24px rgba(126,184,50,.32);}
+.abtn-off{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:rgba(240,232,208,.25);cursor:not-allowed;box-shadow:none;}
+
+/* Finish */
+.finish-box{
+margin:0 16px;
+background:linear-gradient(135deg,rgba(74,124,53,.25),rgba(45,74,30,.4));
+border:2px solid var(–lime);border-radius:16px;padding:22px;text-align:center;display:none;
+}
+.finish-box.show{display:block;animation:popIn .5s cubic-bezier(.34,1.56,.64,1);}
+@keyframes popIn{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.fb-title{font-family:‘Barlow Condensed’,sans-serif;font-weight:900;font-size:1.5rem;letter-spacing:4px;color:var(–lime);}
+.fb-time{font-family:‘Barlow Condensed’,sans-serif;font-weight:900;font-size:3.5rem;color:var(–sun);text-shadow:0 0 28px rgba(232,176,32,.5);line-height:1.1;margin:8px 0 4px;}
+.fb-rank{font-size:.82rem;color:var(–fog);}
+
+/* Records */
+.pb-bar{
+background:linear-gradient(135deg,rgba(232,176,32,.14),rgba(212,95,26,.08));
+border:1px solid rgba(232,176,32,.28);border-radius:10px;padding:12px 15px;
+display:flex;align-items:center;gap:12px;margin-bottom:11px;
+}
+.rec-card{
+background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+border-radius:var(–r);padding:13px 15px;margin-bottom:7px;
+display:flex;align-items:center;gap:11px;
+animation:slideIn .3s ease both;
+}
+.rec-date{text-align:center;min-width:40px;}
+.rec-day{font-family:‘Barlow Condensed’,sans-serif;font-weight:900;font-size:1.5rem;color:var(–lime);line-height:1;}
+.rec-mon{font-size:.58rem;color:var(–fog);letter-spacing:1px;text-transform:uppercase;}
+.rec-div{width:1px;height:34px;background:rgba(255,255,255,.1);}
+.rec-info{flex:1;}
+.rec-time{font-family:‘Barlow Condensed’,sans-serif;font-weight:700;font-size:1.35rem;color:var(–cream);letter-spacing:1px;}
+.rec-cat{font-size:.66rem;color:var(–fog);margin-top:2px;}
+.rank-badge{font-family:‘Barlow Condensed’,sans-serif;font-weight:700;font-size:.75rem;padding:3px 10px;border-radius:20px;white-space:nowrap;}
+.bg-gold{background:rgba(232,176,32,.18);color:var(–sun);border:1px solid rgba(232,176,32,.35);}
+.bg-silver{background:rgba(154,176,184,.13);color:#9ab0b8;border:1px solid rgba(154,176,184,.28);}
+.bg-bronze{background:rgba(160,120,80,.13);color:#c09060;border:1px solid rgba(160,120,80,.28);}
+.bg-norm{background:rgba(255,255,255,.06);color:var(–fog);border:1px solid rgba(255,255,255,.1);}
+
+/* Profile */
+.prof-hero{background:linear-gradient(160deg,var(–moss) 0%,var(–bark) 100%);padding:26px 20px 22px;text-align:center;}
+.prof-av{width:68px;height:68px;border-radius:50%;background:var(–fern);border:3px solid var(–lime);display:flex;align-items:center;justify-content:center;font-size:2.2rem;margin:0 auto 11px;}
+.prof-dog{font-weight:700;font-size:1.2rem;}
+.prof-owner{font-size:.75rem;color:var(–fog);margin-top:2px;}
+.prof-cat{display:inline-block;margin-top:7px;background:rgba(126,184,50,.14);border:1px solid rgba(126,184,50,.28);color:var(–lime);font-size:.63rem;padding:3px 12px;border-radius:12px;letter-spacing:1px;}
+.prof-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.06);border-radius:var(–r);overflow:hidden;margin:14px 16px 0;}
+.ps{background:rgba(0,0,0,.3);padding:13px 6px;text-align:center;}
+.ps-n{font-family:‘Barlow Condensed’,sans-serif;font-weight:700;font-size:1.7rem;color:var(–lime);line-height:1;}
+.ps-l{font-size:.56rem;color:var(–fog);letter-spacing:1px;text-transform:uppercase;margin-top:3px;}
+
+/* Rank screen */
+.cat-tabs{display:flex;gap:6px;padding:0 16px 12px;overflow-x:auto;scrollbar-width:none;}
+.ctab{padding:5px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:20px;font-size:.7rem;cursor:pointer;white-space:nowrap;transition:all .2s;color:var(–fog);font-family:‘Barlow Condensed’,sans-serif;font-weight:600;letter-spacing:1px;}
+.ctab.active{background:rgba(126,184,50,.18);border-color:var(–lime);color:var(–lime);}
+
+/* Badges */
+.live-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(200,50,40,.13);border:1px solid rgba(200,50,40,.28);padding:3px 10px;border-radius:16px;font-size:.58rem;color:#ff8878;font-weight:700;letter-spacing:1px;}
+.live-dot{width:6px;height:6px;background:#ff4444;border-radius:50%;animation:blink 1.2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+.month-tag{font-family:‘Barlow Condensed’,sans-serif;font-size:.72rem;letter-spacing:2px;background:rgba(232,176,32,.13);border:1px solid rgba(232,176,32,.28);color:var(–sun);padding:3px 10px;border-radius:16px;}
+
+/* Toast */
+.toast{position:fixed;bottom:92px;left:50%;transform:translateX(-50%) translateY(8px);padding:10px 22px;border-radius:24px;font-weight:700;font-size:.83rem;z-index:9998;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.tok-ok{background:var(–lime);color:#0a1a05;}
+.tok-err{background:var(–red);color:#fff;}
+.tok-info{background:var(–sky);color:#0a1a20;}
+
+.empty{text-align:center;padding:36px 16px;color:var(–fog);font-size:.82rem;}
+.empty .ei{font-size:2.5rem;margin-bottom:10px;}
+
+.logout-btn{
+margin:16px;width:calc(100% - 32px);padding:12px;
+background:rgba(192,48,32,.12);border:1px solid rgba(192,48,32,.25);
+border-radius:var(–r);color:#ff8878;font-family:‘Noto Sans JP’,sans-serif;
+font-size:.82rem;cursor:pointer;transition:all .2s;
+}
+.logout-btn:hover{background:rgba(192,48,32,.22);}
+</style>
+
+</head>
+<body>
+
+<!-- Loading -->
+
+<div id="loading">
+  <div class="loading-logo">🐾 TRAIL RUSH</div>
+  <div class="loading-sub">読み込み中...</div>
+</div>
+
+<!-- ══ AUTH ══ -->
+
+<div class="screen" id="screen-auth">
+  <div class="auth-hero">
+    <div class="auth-logo">TRAIL<br>RUSH</div>
+    <div class="auth-tag">🐾 犬と走る、自然のアスレチック</div>
+  </div>
+  <div class="auth-tabs">
+    <div class="atab active" onclick="authSwitch('login',this)">ログイン</div>
+    <div class="atab" onclick="authSwitch('register',this)">新規登録</div>
+  </div>
+
+  <!-- Login -->
+
+  <div id="f-login" class="auth-form">
+    <div class="err-msg" id="err-login"></div>
+    <div class="field"><label>メールアドレス</label><input type="email" id="l-email" placeholder="example@mail.com"></div>
+    <div class="field"><label>パスワード</label><input type="password" id="l-pass" placeholder="••••••••"></div>
+    <button class="sbtn" id="btn-login" onclick="doLogin()">ログイン</button>
+  </div>
+
+  <!-- Register -->
+
+  <div id="f-register" class="auth-form" style="display:none;">
+    <div class="err-msg" id="err-reg"></div>
+    <div class="field">
+      <label>🐾 犬の名前 ※必須</label>
+      <input type="text" id="r-dog" placeholder="ポチ">
+    </div>
+    <div class="field">
+      <label>👤 オーナー名 <span style="font-size:.58rem;color:var(--fog);">任意</span></label>
+      <input type="text" id="r-name" placeholder="田中 太郎（省略可）">
+    </div>
+    <div class="field">
+      <label>カテゴリ</label>
+      <select id="r-cat">
+        <option value="総合">総合</option>
+        <option value="小型犬">小型犬（〜10kg）</option>
+        <option value="中型犬">中型犬（10〜25kg）</option>
+        <option value="大型犬">大型犬（25kg〜）</option>
+      </select>
+    </div>
+    <div class="field"><label>メールアドレス</label><input type="email" id="r-email" placeholder="example@mail.com"></div>
+    <div class="field"><label>パスワード</label><input type="password" id="r-pass" placeholder="6文字以上"><div class="hint">※6文字以上</div></div>
+    <button class="sbtn" id="btn-reg" onclick="doRegister()">アカウント作成</button>
+  </div>
+</div>
+
+<!-- ══ HOME ══ -->
+
+<div class="screen" id="screen-home">
+  <div class="topbar">
+    <div class="wm">TRAIL<em>RUSH</em></div>
+    <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+  </div>
+  <div class="hero">
+    <div class="hero-trees"></div>
+    <div class="hero-content">
+      <div class="hero-month" id="h-month"></div>
+      <div class="hero-title">MONTHLY<br>RANKING</div>
+      <div class="hero-sub" id="h-sub">読み込み中...</div>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-n" id="h-total">-</div><div class="stat-l">参加者</div></div>
+    <div class="stat"><div class="stat-n" id="h-runs">-</div><div class="stat-l">総走行数</div></div>
+    <div class="stat"><div class="stat-n" id="h-best" style="color:var(--sun);font-size:1.1rem;">--:--</div><div class="stat-l">月間ベスト</div></div>
+  </div>
+  <div class="sec">
+    <div class="sec-head">
+      <div class="sec-title">🏆 TOP RANKING</div>
+      <div class="month-tag" id="h-month-tag"></div>
+    </div>
+    <div class="rank-list" id="home-rank-list">
+      <div class="empty"><div class="ei">🐾</div>まだ記録がありません</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TIMER ══ -->
+
+<div class="screen" id="screen-timer">
+  <div class="topbar">
+    <div class="wm">TRAIL<em>RUSH</em></div>
+    <div style="font-size:.68rem;color:var(--fog);letter-spacing:2px;">タイム計測</div>
+  </div>
+  <div class="timer-hero">
+    <div class="timer-label" id="t-label">準備完了</div>
+    <div class="timer-num" id="t-display">00:00.0</div>
+  </div>
+  <div class="user-card">
+    <div class="uc-av">🐾</div>
+    <div class="uc-info">
+      <div class="uc-dog" id="t-dog">-</div>
+      <div class="uc-sub" id="t-sub">-</div>
+    </div>
+    <div class="uc-best">
+      <div class="uc-best-l">自己ベスト</div>
+      <div class="uc-best-v" id="t-best">--:--</div>
+    </div>
+  </div>
+  <div class="steps">
+    <div class="step cur" id="s-wait"><div class="step-dot">🏕️</div><div class="step-l">待機</div></div>
+    <div class="step" id="s-run"><div class="step-dot">🏃</div><div class="step-l">走行中</div></div>
+    <div class="step" id="s-fin"><div class="step-dot">🎉</div><div class="step-l">完走</div></div>
+  </div>
+  <div class="action-wrap">
+    <button class="abtn abtn-start" id="btn-start" onclick="timerStart()">🏁 スタート</button>
+    <button class="abtn abtn-off" id="btn-goal" onclick="timerGoal()" disabled>🏆 ゴール</button>
+  </div>
+  <div class="finish-box" id="finish-box">
+    <div class="fb-title">🎉 GOAL!</div>
+    <div style="font-size:.7rem;color:var(--fog);">今回のタイム</div>
+    <div class="fb-time" id="fb-time">--:--.-</div>
+    <div class="fb-rank" id="fb-rank"></div>
+    <button class="sbtn" style="margin-top:14px;font-size:.9rem;padding:11px;" onclick="resetTimer()">もう一度走る 🔄</button>
+  </div>
+</div>
+
+<!-- ══ RECORDS ══ -->
+
+<div class="screen" id="screen-records">
+  <div class="topbar">
+    <div class="wm">TRAIL<em>RUSH</em></div>
+    <div style="font-size:.68rem;color:var(--fog);letter-spacing:2px;">自分の記録</div>
+  </div>
+  <div class="prof-hero">
+    <div class="prof-av">🐾</div>
+    <div class="prof-dog" id="p-dog">-</div>
+    <div class="prof-owner" id="p-owner">-</div>
+    <div class="prof-cat" id="p-cat">-</div>
+  </div>
+  <div class="prof-stats">
+    <div class="ps"><div class="ps-n" id="p-total">0</div><div class="ps-l">総走行</div></div>
+    <div class="ps"><div class="ps-n" id="p-best" style="color:var(--sun);font-size:1.1rem;">--:--</div><div class="ps-l">自己ベスト</div></div>
+    <div class="ps"><div class="ps-n" id="p-rank">-</div><div class="ps-l">今月順位</div></div>
+  </div>
+  <div class="sec" style="margin-top:14px;">
+    <div class="sec-head">
+      <div class="sec-title">📊 走行記録</div>
+      <div class="month-tag" id="rec-month-tag"></div>
+    </div>
+    <div id="rec-list"><div class="empty"><div class="ei">🐾</div>まだ記録がありません</div></div>
+  </div>
+  <button class="logout-btn" onclick="doLogout()">ログアウト</button>
+</div>
+
+<!-- ══ RANKING ══ -->
+
+<div class="screen" id="screen-ranking">
+  <div class="topbar">
+    <div class="wm">TRAIL<em>RUSH</em></div>
+    <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+  </div>
+  <div style="padding:0 16px 10px;">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.7rem;letter-spacing:3px;" id="rank-title">月間ランキング</div>
+    <div style="font-size:.7rem;color:var(--fog);margin-top:2px;" id="rank-period">読み込み中...</div>
+  </div>
+  <div class="cat-tabs" id="cat-tabs">
+    <div class="ctab active" onclick="setCat('全て',this)">全て</div>
+    <div class="ctab" onclick="setCat('小型犬',this)">小型犬</div>
+    <div class="ctab" onclick="setCat('中型犬',this)">中型犬</div>
+    <div class="ctab" onclick="setCat('大型犬',this)">大型犬</div>
+  </div>
+  <div style="padding:0 16px;">
+    <div class="rank-list" id="rank-list">
+      <div class="empty"><div class="ei">🐾</div>まだ記録がありません</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ NAV ══ -->
+
+<div class="nav" id="nav">
+  <div class="ni active" onclick="goScreen('home',this)"><span class="ni-icon">🏠</span>ホーム</div>
+  <div class="ni" onclick="goScreen('timer',this)"><span class="ni-icon">⏱️</span>計測</div>
+  <div class="ni" onclick="goScreen('records',this)"><span class="ni-icon">📊</span>記録</div>
+  <div class="ni" onclick="goScreen('ranking',this)"><span class="ni-icon">🏆</span>ランキング</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase -->
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, doc, setDoc, getDoc, addDoc, query, where, orderBy, getDocs, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ── Firebase Config ──
+const firebaseConfig = {
+  apiKey: "AIzaSyBrIS53Ahx5iBprFNXjUZ9Xy3N7DN2OCSU",
+  authDomain: "wanpeace-ee252.firebaseapp.com",
+  projectId: "wanpeace-ee252",
+  storageBucket: "wanpeace-ee252.firebasestorage.app",
+  messagingSenderId: "428302662863",
+  appId: "1:428302662863:web:4cbffd10c4982de9ce0bba",
+  measurementId: "G-NDBHVQ8VS2"
+};
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+// ── State ──
+let currentUser = null;
+let userProfile = null;
+let timerState  = 'wait';
+let startTs     = null;
+let timerIv     = null;
+let catFilter   = '全て';
+let rankUnsub   = null;
+
+// ── Utils ──
+function fmt(ms) {
+  if(ms==null) return '--:--.-';
+  const t=Math.floor(ms/100);
+  const m=Math.floor(t/600);
+  const s=Math.floor((t%600)/10);
+  const d=t%10;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${d}`;
+}
+
+function monthLabel(d=new Date()) {
+  return `${d.getFullYear()}年${d.getMonth()+1}月`;
+}
+function monthKey(d=new Date()) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+function periodStr(d=new Date()) {
+  const y=d.getFullYear(), m=d.getMonth()+1;
+  const last=new Date(y,m,0).getDate();
+  return `${y}/${String(m).padStart(2,'0')}/01 〜 ${y}/${String(m).padStart(2,'0')}/${last} ・ ベストタイム順`;
+}
+
+function showToast(msg,type='ok') {
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.className=`toast tok-${type} show`;
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>el.classList.remove('show'),2800);
+}
+
+function hideLoading() {
+  const el=document.getElementById('loading');
+  el.classList.add('hide');
+  setTimeout(()=>el.style.display='none',500);
+}
+
+// ── Auth State ──
+onAuthStateChanged(auth, async user => {
+  if(user) {
+    currentUser = user;
+    // Load profile
+    const snap = await getDoc(doc(db,'users',user.uid));
+    if(snap.exists()) {
+      userProfile = snap.data();
+      enterApp();
+    } else {
+      // Profile missing → logout
+      await signOut(auth);
+      showAuthScreen();
+    }
+  } else {
+    currentUser = null;
+    userProfile = null;
+    showAuthScreen();
+  }
+  hideLoading();
+});
+
+function showAuthScreen() {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-auth').classList.add('active');
+  document.getElementById('nav').classList.remove('show');
+}
+
+function enterApp() {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-home').classList.add('active');
+  document.getElementById('nav').classList.add('show');
+  document.querySelectorAll('.ni').forEach((n,i)=>{n.classList.toggle('active',i===0);});
+  updateTimerUI();
+  loadHome();
+  loadRecords();
+  loadRanking();
+}
+
+// ── Auth Tab ──
+window.authSwitch = (tab, el) => {
+  document.querySelectorAll('.atab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('f-login').style.display    = tab==='login'    ? 'block':'none';
+  document.getElementById('f-register').style.display = tab==='register' ? 'block':'none';
+};
+
+// ── Register ──
+window.doRegister = async () => {
+  const dog   = document.getElementById('r-dog').value.trim();
+  const name  = document.getElementById('r-name').value.trim() || 'オーナー';
+  const cat   = document.getElementById('r-cat').value;
+  const email = document.getElementById('r-email').value.trim();
+  const pass  = document.getElementById('r-pass').value;
+  const errEl = document.getElementById('err-reg');
+  const btn   = document.getElementById('btn-reg');
+
+  errEl.style.display='none';
+  if(!dog) { errEl.textContent='🐾 犬の名前を入力してください'; errEl.style.display='block'; return; }
+  if(!email||!pass) { errEl.textContent='メールアドレスとパスワードを入力してください'; errEl.style.display='block'; return; }
+
+  btn.disabled=true; btn.textContent='作成中...';
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await setDoc(doc(db,'users',cred.user.uid), { dog, name, cat, email, createdAt: serverTimestamp() });
+    showToast(`🐾 ${dog} で登録しました！`);
+  } catch(e) {
+    const msgs = {
+      'auth/email-already-in-use':'このメールは既に使用されています',
+      'auth/weak-password':'パスワードは6文字以上にしてください',
+      'auth/invalid-email':'メールアドレスの形式が正しくありません',
+    };
+    errEl.textContent = msgs[e.code] || 'エラーが発生しました: '+e.message;
+    errEl.style.display='block';
+    btn.disabled=false; btn.textContent='アカウント作成';
+  }
+};
+
+// ── Login ──
+window.doLogin = async () => {
+  const email = document.getElementById('l-email').value.trim();
+  const pass  = document.getElementById('l-pass').value;
+  const errEl = document.getElementById('err-login');
+  const btn   = document.getElementById('btn-login');
+
+  errEl.style.display='none';
+  if(!email||!pass) { errEl.textContent='メールアドレスとパスワードを入力してください'; errEl.style.display='block'; return; }
+
+  btn.disabled=true; btn.textContent='ログイン中...';
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    showToast('ログインしました！🐾');
+  } catch(e) {
+    const msgs = {
+      'auth/user-not-found':'アカウントが見つかりません',
+      'auth/wrong-password':'パスワードが正しくありません',
+      'auth/invalid-email':'メールアドレスの形式が正しくありません',
+      'auth/invalid-credential':'メールアドレスまたはパスワードが正しくありません',
+    };
+    errEl.textContent = msgs[e.code] || 'ログインに失敗しました';
+    errEl.style.display='block';
+    btn.disabled=false; btn.textContent='ログイン';
+  }
+};
+
+// ── Logout ──
+window.doLogout = async () => {
+  if(!confirm('ログアウトしますか？')) return;
+  await signOut(auth);
+  showToast('ログアウトしました','info');
+};
+
+// ── Navigation ──
+window.goScreen = (name, el) => {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  if(el) el.classList.add('active');
+  if(name==='ranking') loadRanking();
+  if(name==='records') loadRecords();
+  if(name==='home')    loadHome();
+};
+
+// ── Timer ──
+window.timerStart = () => {
+  if(timerState!=='wait') return;
+  timerState='running'; startTs=Date.now();
+  document.getElementById('t-label').textContent='走行中 🏃🐾';
+  document.getElementById('t-display').classList.add('running');
+  document.getElementById('btn-start').className='abtn abtn-off'; document.getElementById('btn-start').disabled=true;
+  document.getElementById('btn-goal').className='abtn abtn-goal'; document.getElementById('btn-goal').disabled=false;
+  document.getElementById('s-wait').className='step done';
+  document.getElementById('s-run').className='step cur';
+  timerIv=setInterval(()=>{ document.getElementById('t-display').textContent=fmt(Date.now()-startTs); },100);
+  showToast('🏁 スタート！');
+};
+
+window.timerGoal = async () => {
+  if(timerState!=='running') return;
+  timerState='finished';
+  clearInterval(timerIv);
+  const elapsed=Date.now()-startTs;
+  const timeStr=fmt(elapsed);
+
+  document.getElementById('t-label').textContent='ゴール！🎉';
+  document.getElementById('t-display').classList.remove('running');
+  document.getElementById('t-display').classList.add('done');
+  document.getElementById('btn-goal').className='abtn abtn-off'; document.getElementById('btn-goal').disabled=true;
+  document.getElementById('s-run').className='step done';
+  document.getElementById('s-fin').className='step done';
+
+  // Save to Firestore
+  if(currentUser && userProfile) {
+    try {
+      await addDoc(collection(db,'runs'), {
+        uid:      currentUser.uid,
+        dog:      userProfile.dog,
+        name:     userProfile.name,
+        cat:      userProfile.cat,
+        timeMs:   elapsed,
+        month:    monthKey(),
+        createdAt: serverTimestamp()
+      });
+      showToast(`🎉 ゴール！ ${timeStr} を記録しました`);
+    } catch(e) {
+      showToast('記録の保存に失敗しました','err');
+    }
+  }
+
+  // Show rank
+  document.getElementById('fb-time').textContent=timeStr;
+  document.getElementById('finish-box').classList.add('show');
+
+  // Calc rank
+  try {
+    const q=query(collection(db,'runs'),where('month','==',monthKey()));
+    const snap=await getDocs(q);
+    const times=[];
+    const bestMap={};
+    snap.forEach(d=>{ const r=d.data(); if(!bestMap[r.uid]||r.timeMs<bestMap[r.uid]) bestMap[r.uid]=r.timeMs; });
+    Object.values(bestMap).forEach(t=>times.push(t));
+    times.sort((a,b)=>a-b);
+    const myBest=bestMap[currentUser.uid];
+    const rank=times.indexOf(myBest)+1;
+    document.getElementById('fb-rank').textContent=`今月 ${rank}位 ／ ${times.length}人中`;
+  } catch(e){}
+
+  loadRecords();
+  loadHome();
+};
+
+window.resetTimer = () => {
+  timerState='wait'; startTs=null; clearInterval(timerIv);
+  document.getElementById('t-display').textContent='00:00.0';
+  document.getElementById('t-display').className='timer-num';
+  document.getElementById('t-label').textContent='準備完了';
+  document.getElementById('btn-start').className='abtn abtn-start'; document.getElementById('btn-start').disabled=false;
+  document.getElementById('btn-goal').className='abtn abtn-off'; document.getElementById('btn-goal').disabled=true;
+  document.getElementById('s-wait').className='step cur';
+  document.getElementById('s-run').className='step';
+  document.getElementById('s-fin').className='step';
+  document.getElementById('finish-box').classList.remove('show');
+};
+
+function updateTimerUI() {
+  if(!userProfile) return;
+  document.getElementById('t-dog').textContent=userProfile.dog;
+  document.getElementById('t-sub').textContent=`👤 ${userProfile.name} ・ ${userProfile.cat}`;
+}
+
+// ── Home ──
+async function loadHome() {
+  if(!currentUser) return;
+  const mk=monthKey();
+  document.getElementById('h-month').textContent=monthLabel();
+  document.getElementById('h-month-tag').textContent=monthLabel().replace('年','年 ').replace('月','月');
+
+  try {
+    const q=query(collection(db,'runs'),where('month','==',mk));
+    const snap=await getDocs(q);
+    const bestMap={}; const countMap={}; const infoMap={};
+    let totalRuns=0;
+    snap.forEach(d=>{
+      const r=d.data(); totalRuns++;
+      if(!bestMap[r.uid]||r.timeMs<bestMap[r.uid]){ bestMap[r.uid]=r.timeMs; infoMap[r.uid]={dog:r.dog,name:r.name,cat:r.cat}; }
+      countMap[r.uid]=(countMap[r.uid]||0)+1;
+    });
+
+    const entries=Object.entries(bestMap).map(([uid,t])=>({uid,timeMs:t,...infoMap[uid],count:countMap[uid]}));
+    entries.sort((a,b)=>a.timeMs-b.timeMs);
+
+    document.getElementById('h-total').textContent=entries.length;
+    document.getElementById('h-runs').textContent=totalRuns;
+    document.getElementById('h-best').textContent=entries.length ? fmt(entries[0].timeMs):'--:--';
+    document.getElementById('h-sub').textContent=`参加者 ${entries.length}組 ／ 総走行 ${totalRuns}回`;
+
+    const medals=['🥇','🥈','🥉'];
+    const list=document.getElementById('home-rank-list');
+    if(!entries.length){ list.innerHTML='<div class="empty"><div class="ei">🐾</div>まだ記録がありません</div>'; return; }
+
+    list.innerHTML=entries.slice(0,5).map((e,i)=>{
+      const isMine=e.uid===currentUser.uid;
+      const cls=`rc ${i===0?'r1':i===1?'r2':i===2?'r3':''} ${isMine?'mine':''}`;
+      return `<div class="${cls}" style="animation-delay:${i*.07}s">
+        <div class="rc-pos">${i<3?medals[i]:i+1}</div>
+        <div class="rc-av">🐾</div>
+        <div class="rc-info">
+          <div class="rc-dog">${e.dog}${isMine?'<span class="you-tag">YOU</span>':''}</div>
+          <div class="rc-owner">👤 ${e.name} ・ ${e.cat}</div>
+        </div>
+        <div class="rc-right">
+          <div class="rc-time" style="${isMine?'color:var(--sun)':''}">${fmt(e.timeMs)}</div>
+          <div class="rc-count">${e.count}回走行</div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e){ console.error(e); }
+}
+
+// ── Records ──
+async function loadRecords() {
+  if(!currentUser||!userProfile) return;
+  document.getElementById('p-dog').textContent=userProfile.dog;
+  document.getElementById('p-owner').textContent=`👤 ${userProfile.name}`;
+  document.getElementById('p-cat').textContent=userProfile.cat;
+  document.getElementById('rec-month-tag').textContent=monthLabel();
+
+  try {
+    const mk=monthKey();
+    const q=query(collection(db,'runs'),where('uid','==',currentUser.uid),where('month','==',mk),orderBy('createdAt','desc'));
+    const snap=await getDocs(q);
+    const runs=[];
+    snap.forEach(d=>runs.push({id:d.id,...d.data()}));
+
+    document.getElementById('p-total').textContent=runs.length;
+
+    if(!runs.length){
+      document.getElementById('p-best').textContent='--:--';
+      document.getElementById('p-rank').textContent='-';
+      document.getElementById('rec-list').innerHTML='<div class="empty"><div class="ei">🐾</div>今月はまだ走行記録がありません</div>';
+      return;
+    }
+
+    const myBest=Math.min(...runs.map(r=>r.timeMs));
+    document.getElementById('p-best').textContent=fmt(myBest);
+
+    // Rank
+    const allQ=query(collection(db,'runs'),where('month','==',mk));
+    const allSnap=await getDocs(allQ);
+    const bestMap={};
+    allSnap.forEach(d=>{ const r=d.data(); if(!bestMap[r.uid]||r.timeMs<bestMap[r.uid]) bestMap[r.uid]=r.timeMs; });
+    const times=Object.values(bestMap).sort((a,b)=>a-b);
+    const myRank=times.indexOf(myBest)+1;
+    document.getElementById('p-rank').textContent=`${myRank}位`;
+
+    // Rank badge helper
+    function badge(rank){ 
+      if(rank===1) return '<span class="rank-badge bg-gold">🥇 1位</span>';
+      if(rank===2) return '<span class="rank-badge bg-silver">🥈 2位</span>';
+      if(rank===3) return '<span class="rank-badge bg-bronze">🥉 3位</span>';
+      return `<span class="rank-badge bg-norm">${rank}位</span>`;
+    }
+
+    // Build rank lookup per run (vs all runs globally)
+    const allRuns=[];
+    allSnap.forEach(d=>allRuns.push(d.data()));
+    allRuns.sort((a,b)=>a.timeMs-b.timeMs);
+
+    const mons=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    const pb=myBest;
+
+    document.getElementById('rec-list').innerHTML=runs.map((r,i)=>{
+      const d=r.createdAt?.toDate ? r.createdAt.toDate() : new Date();
+      const isPB=r.timeMs===pb;
+      // global rank for this specific run
+      const runRank=allRuns.findIndex(x=>x.timeMs===r.timeMs&&x.uid===r.uid)+1||'-';
+      return `<div class="rec-card" style="animation-delay:${i*.06}s">
+        <div class="rec-date"><div class="rec-day">${String(d.getDate()).padStart(2,'0')}</div><div class="rec-mon">${mons[d.getMonth()]}</div></div>
+        <div class="rec-div"></div>
+        <div class="rec-info">
+          <div class="rec-time">${fmt(r.timeMs)}${isPB?' ⚡':''}</div>
+          <div class="rec-cat">${r.cat}</div>
+        </div>
+        ${badge(runRank)}
+      </div>`;
+    }).join('');
+
+  } catch(e){ console.error(e); }
+}
+
+// ── Ranking ──
+window.setCat = (cat, el) => {
+  catFilter=cat;
+  document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  loadRanking();
+};
+
+async function loadRanking() {
+  if(!currentUser) return;
+  const mk=monthKey();
+  document.getElementById('rank-title').textContent=`${monthLabel()} ランキング`;
+  document.getElementById('rank-period').textContent=periodStr();
+
+  try {
+    const q=query(collection(db,'runs'),where('month','==',mk));
+    const snap=await getDocs(q);
+    const bestMap={}; const countMap={}; const infoMap={};
+    snap.forEach(d=>{
+      const r=d.data();
+      if(catFilter!=='全て'&&r.cat!==catFilter) return;
+      if(!bestMap[r.uid]||r.timeMs<bestMap[r.uid]){ bestMap[r.uid]=r.timeMs; infoMap[r.uid]={dog:r.dog,name:r.name,cat:r.cat}; }
+      countMap[r.uid]=(countMap[r.uid]||0)+1;
+    });
+
+    const entries=Object.entries(bestMap).map(([uid,t])=>({uid,timeMs:t,...infoMap[uid],count:countMap[uid]}));
+    entries.sort((a,b)=>a.timeMs-b.timeMs);
+
+    const medals=['🥇','🥈','🥉'];
+    const list=document.getElementById('rank-list');
+    if(!entries.length){ list.innerHTML='<div class="empty"><div class="ei">🐾</div>まだ記録がありません</div>'; return; }
+
+    list.innerHTML=entries.map((e,i)=>{
+      const isMine=e.uid===currentUser.uid;
+      const cls=`rc ${i===0?'r1':i===1?'r2':i===2?'r3':''} ${isMine?'mine':''}`;
+      return `<div class="${cls}" style="animation-delay:${i*.05}s">
+        <div class="rc-pos">${i<3?medals[i]:i+1}</div>
+        <div class="rc-av">🐾</div>
+        <div class="rc-info">
+          <div class="rc-dog">${e.dog}${isMine?'<span class="you-tag">YOU</span>':''}</div>
+          <div class="rc-owner">👤 ${e.name} ・ ${e.cat}</div>
+        </div>
+        <div class="rc-right">
+          <div class="rc-time" style="${isMine?'color:var(--sun)':''}">${fmt(e.timeMs)}</div>
+          <div class="rc-count">${e.count}回走行</div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e){ console.error(e); }
+}
+
+</script>
+
+</body>
+</html>

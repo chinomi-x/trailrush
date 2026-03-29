@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+　<!DOCTYPE html>
 
 <html lang="ja">
 <head>
@@ -473,10 +473,6 @@ function hideLoading() {
 }
 
 // ── Auth State ──
-// QRスキャン時はaction paramがあるので、ログイン状態復元を待つ
-const params = new URLSearchParams(location.search);
-const pendingAction = params.get('action');
-
 onAuthStateChanged(auth, async user => {
   if(user) {
     currentUser = user;
@@ -490,14 +486,7 @@ onAuthStateChanged(auth, async user => {
     }
   } else {
     currentUser = null; userProfile = null;
-    // QRスキャン中（actionあり）の場合はローディングのまま少し待つ
-    if(pendingAction) {
-      // Firebaseの認証復元を最大5秒待つ
-      await new Promise(resolve => setTimeout(resolve, 5000));
-      if(!currentUser) showAuthScreen();
-    } else {
-      showAuthScreen();
-    }
+    showAuthScreen();
   }
   hideLoading();
 });

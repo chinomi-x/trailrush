@@ -1,4 +1,4 @@
-　<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="ja">
 <head>
@@ -598,16 +598,19 @@ function startScanning() {
     showToast(`カメラ: ${video.videoWidth}x${video.videoHeight}`,'info');
   }, 1500);
 
+  let frameCount = 0;
   scanInterval = setInterval(() => {
     if(video.readyState !== video.HAVE_ENOUGH_DATA) return;
-    const scale = 0.5;
+    frameCount++;
+    // フレームごとに解像度を変えて試す
+    const scale = frameCount % 2 === 0 ? 1.0 : 0.5;
     canvas.width = video.videoWidth * scale;
     canvas.height = video.videoHeight * scale;
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' });
     if(code && code.data) {
-      showToast(`QR検出: ${code.data.substring(0,30)}`,'info');
+      showToast(`QR検出: ${code.data.substring(0,40)}`,'info');
       const url = code.data;
       if(url.includes('action=start') || url.includes('action=goal')) {
         const action = url.includes('action=start') ? 'start' : 'goal';

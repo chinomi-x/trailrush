@@ -171,7 +171,7 @@ body::before{
 .logout-btn{margin:16px;width:calc(100% - 32px);padding:12px;background:rgba(192,48,32,.12);border:1px solid rgba(192,48,32,.25);border-radius:var(--r);color:#ff8878;font-family:'Noto Sans JP',sans-serif;font-size:.82rem;cursor:pointer;transition:all .2s;}
 .logout-btn:hover{background:rgba(192,48,32,.22);}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsQR.min.js"></script>
+<script src="https://unpkg.com/@zxing/browser@0.1.4/umd/index.min.js"></script>
 </head>
 <body>
 
@@ -560,91 +560,54 @@ async function enterApp() {
   }
 }
 
-// ── Camera QR Scanner ──
-let cameraStream = null;
-let scanInterval = null;
-let currentScanMode = null; // 'start' or 'goal'
+// ── Camera QR Scanner (ZXing) ──
+let zxingControls = null;
+let currentScanMode = null;
 
 window.openCamera = async (mode) => {
   currentScanMode = mode;
   const modal = document.getElementById('camera-modal');
   const label = document.getElementById('camera-label');
+  const video = document.getElementById('camera-video');
   label.textContent = mode === 'start' ? '🏁 スタートQRを読み取り中' : '🏆 ゴールQRを読み取り中';
   modal.style.display = 'block';
 
   try {
-    cameraStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+    const codeReader = new ZXingBrowser.BrowserQRCodeReader();
+    const devices = await ZXingBrowser.BrowserCodeReader.listVideoInputDevices();
+    // 背面カメラを優先
+    const deviceId = devices.find(d => /back|rear|environment/i.test(d.label))?.deviceId || (devices[devices.length-1]?.deviceId);
+    
+    zxingControls = await codeReader.decodeFromVideoDevice(deviceId, video, (result, error) => {
+      if(result) {
+        const url = result.getText();
+        handleQRResult(url);
+      }
     });
-    const video = document.getElementById('camera-video');
-    video.srcObject = cameraStream;
-    video.play();
-    video.addEventListener('loadedmetadata', () => startScanning());
   } catch(e) {
     console.error('Camera error:', e);
     closeCamera();
-    showToast('カメラを起動できませんでした。カメラの許可を確認してください','err');
+    showToast('カメラを起動できませんでした','err');
   }
 };
 
-function startScanning() {
-  const video = document.getElementById('camera-video');
-  const canvas = document.getElementById('camera-canvas');
-  const ctx = canvas.getContext('2d');
-  let lastToast = 0;
-
-  // デバッグ：ビデオサイズ確認
-  setTimeout(()=>{
-    showToast(`カメラ: ${video.videoWidth}x${video.videoHeight}`,'info');
-  }, 1500);
-
-  let frameCount = 0;
-  scanInterval = setInterval(() => {
-    if(video.readyState !== video.HAVE_ENOUGH_DATA) return;
-    frameCount++;
-    // フレームごとに解像度を変えて試す
-    const scale = frameCount % 2 === 0 ? 1.0 : 0.5;
-    canvas.width = video.videoWidth * scale;
-    canvas.height = video.videoHeight * scale;
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' });
-    if(code && code.data) {
-      showToast(`QR検出: ${code.data.substring(0,40)}`,'info');
-      const url = code.data;
-      if(url.includes('action=start') || url.includes('action=goal')) {
-        const action = url.includes('action=start') ? 'start' : 'goal';
-        if(action === currentScanMode) {
-          closeCamera();
-          if(action === 'start') {
-            timerStart();
-          } else {
-            timerGoal();
-          }
-        } else {
-          const now = Date.now();
-          if(now - lastToast > 2000) {
-            lastToast = now;
-            showToast(action==='start' ? '⚠️ これはスタートQRです' : '⚠️ これはゴールQRです','err');
-          }
-        }
-      } else {
-        const now = Date.now();
-        if(now - lastToast > 2000) {
-          lastToast = now;
-          showToast('⚠️ このQRコードは対応していません','err');
-        }
-      }
+function handleQRResult(url) {
+  if(url.includes('action=start') || url.includes('action=goal')) {
+    const action = url.includes('action=start') ? 'start' : 'goal';
+    if(action === currentScanMode) {
+      closeCamera();
+      if(action === 'start') { timerStart(); }
+      else { timerGoal(); }
+    } else {
+      showToast(action==='start' ? '⚠️ これはスタートQRです' : '⚠️ これはゴールQRです','err');
     }
-  }, 150);
+  } else {
+    showToast('⚠️ このQRコードは対応していません','err');
+  }
 }
 
 window.closeCamera = () => {
-  clearInterval(scanInterval);
-  if(cameraStream) {
-    cameraStream.getTracks().forEach(t => t.stop());
-    cameraStream = null;
-  }
+  if(zxingControls) { zxingControls.stop(); zxingControls = null; }
   document.getElementById('camera-modal').style.display = 'none';
 };
 

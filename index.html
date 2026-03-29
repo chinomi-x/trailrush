@@ -445,6 +445,10 @@ function hideLoading() {
 }
 
 // ── Auth State ──
+// QRスキャン時はaction paramがあるので、ログイン状態復元を待つ
+const params = new URLSearchParams(location.search);
+const pendingAction = params.get('action');
+
 onAuthStateChanged(auth, async user => {
   if(user) {
     currentUser = user;
@@ -458,7 +462,14 @@ onAuthStateChanged(auth, async user => {
     }
   } else {
     currentUser = null; userProfile = null;
-    showAuthScreen();
+    // QRスキャン中（actionあり）の場合はローディングのまま少し待つ
+    if(pendingAction) {
+      // Firebaseの認証復元を最大5秒待つ
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      if(!currentUser) showAuthScreen();
+    } else {
+      showAuthScreen();
+    }
   }
   hideLoading();
 });
@@ -486,9 +497,11 @@ async function enterApp() {
     document.getElementById('screen-timer').classList.add('active');
     document.querySelectorAll('.ni').forEach((n,i)=>n.classList.toggle('active',i===1));
     history.replaceState(null,'',location.pathname);
-    // Firebaseからスタート時刻を復元
+    // Firebaseからスタート時刻を復元（5秒タイムアウト）
     try {
-      const snap = await getDoc(doc(db,'active_runs',currentUser.uid));
+      const timeout = new Promise((_,reject) => setTimeout(()=>reject(new Error('timeout')), 5000));
+      const fetchSnap = getDoc(doc(db,'active_runs',currentUser.uid));
+      const snap = await Promise.race([fetchSnap, timeout]);
       if(snap.exists() && snap.data().status==='running') {
         const rawTs = snap.data().startTs;
         startTs = Number(rawTs);
@@ -499,8 +512,26 @@ async function enterApp() {
         document.getElementById('t-display').textContent = fmt(Date.now()-startTs);
         document.getElementById('qr-hint-start').style.display='none';
         document.getElementById('qr-hint-goal').style.display='block';
+      } else {
+        // スタート記録が見つからない
+        showToast('スタート記録が見つかりません。再度スタートQRを読み取ってください','err');
+        document.getElementById('screen-timer').classList.remove('active');
+        document.getElementById('screen-home').classList.add('active');
+        document.querySelectorAll('.ni').forEach((n,i)=>n.classList.toggle('active',i===0));
+        return;
       }
-    } catch(e){ console.error('restore error:',e); }
+    } catch(e) {
+      console.error('restore error:',e);
+      if(e.message==='timeout') {
+        showToast('通信に時間がかかっています。電波の良い場所で再度お試しください','err');
+      } else {
+        showToast('エラーが発生しました。再度お試しください','err');
+      }
+      document.getElementById('screen-timer').classList.remove('active');
+      document.getElementById('screen-home').classList.add('active');
+      document.querySelectorAll('.ni').forEach((n,i)=>n.classList.toggle('active',i===0));
+      return;
+    }
     await timerGoal();
   } else {
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));

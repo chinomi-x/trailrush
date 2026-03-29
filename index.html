@@ -602,19 +602,22 @@ function startScanning() {
   const video = document.getElementById('camera-video');
   const canvas = document.getElementById('camera-canvas');
   const ctx = canvas.getContext('2d');
+  let lastToast = 0;
 
   scanInterval = setInterval(() => {
     if(video.readyState !== video.HAVE_ENOUGH_DATA) return;
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    // 解像度を下げて処理速度を上げる
+    const scale = 0.5;
+    canvas.width = video.videoWidth * scale;
+    canvas.height = video.videoHeight * scale;
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
-    if(code) {
+    // 両方向の反転を試みる
+    const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' });
+    if(code && code.data) {
       const url = code.data;
-      // URLが自分のアプリのものか確認
-      if(url.includes('?action=start') || url.includes('?action=goal')) {
-        const action = url.includes('?action=start') ? 'start' : 'goal';
+      if(url.includes('action=start') || url.includes('action=goal')) {
+        const action = url.includes('action=start') ? 'start' : 'goal';
         if(action === currentScanMode) {
           closeCamera();
           if(action === 'start') {
@@ -623,13 +626,21 @@ function startScanning() {
             timerGoal();
           }
         } else {
-          showToast(action==='start' ? '⚠️ これはスタートQRです' : '⚠️ これはゴールQRです','err');
+          const now = Date.now();
+          if(now - lastToast > 2000) {
+            lastToast = now;
+            showToast(action==='start' ? '⚠️ これはスタートQRです' : '⚠️ これはゴールQRです','err');
+          }
         }
       } else {
-        showToast('⚠️ このQRコードは対応していません','err');
+        const now = Date.now();
+        if(now - lastToast > 2000) {
+          lastToast = now;
+          showToast('⚠️ このQRコードは対応していません','err');
+        }
       }
     }
-  }, 300);
+  }, 150);
 }
 
 window.closeCamera = () => {

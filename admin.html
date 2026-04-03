@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>TRAIL RUSH - 管理画面</<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>TRAIL RUSH - 管理画面</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --soil:#1c1208;--bark:#2a1f0e;--moss:#2d4a1e;--fern:#4a7c35;
+  --lime:#7eb832;--sun:#e8b020;--ember:#d45f1a;--red:#c03020;
+  --cream:#f0e8d0;--fog:rgba(240,232,208,0.5);--r:12px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--soil);color:var(--cream);min-height:100vh;max-width:480px;margin:0 auto;}
+
+#loading{position:fixed;inset:0;background:var(–soil);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .5s;}
+#loading.hide{opacity:0;pointer-events:none;}
+.loading-logo{font-family:‘Barlow Condensed’,sans-serif;font-weight:900;font-size:2.5rem;letter-spacing:6px;color:var(–sun);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+.topbar{position:sticky;top:0;z-index:100;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;background:var(–bark);border-bottom:2px solid var(–sun);}
+.wm{font-family:‘Barlow Condensed’,sans-serif;font-weight:900;font-size:1.3rem;letter-spacing:3px;color:var(–sun);}
+.admin-badge{background:rgba(232,176,32,.2);border:1px solid rgba(232,176,32,.4);color:var(–sun);font-size:.62rem;padding:3px 10px;border-radius:12px;letter-spacing:2px;}
+
+/* Auth */
+.auth-wrap{padding:40px 20px;}
+.auth-title{font-family:‘Barlow Condensed’,sans-serif;font-size:1.8rem;letter-spacing:3px;color:var(–sun);margin-bottom:20px;text-align:center;}
+.field{margin-bottom:12px;}
+.field label{display:block;font-size:.65rem;letter-spacing:1.5px;color:var(–sun);text-transform:uppercase;margin-bottom:5px;}
+.field input{width:100%;padding:12px 14px;background:rgba(0,0,0,.45);border:1.5px solid rgba(255,255,255,.12);border-radius:9px;color:var(–cream);font-size:.95rem;font-family:‘Noto Sans JP’,sans-serif;outline:none;-webkit-text-fill-color:var(–cream);}
+.field input:focus{border-color:var(–sun);}
+.sbtn{width:100%;padding:13px;background:linear-gradient(135deg,#8a6010,var(–sun));border:none;border-radius:var(–r);font-family:‘Barlow Condensed’,sans-serif;font-weight:700;font-size:1.1rem;letter-spacing:3px;color:#1a0e00;cursor:pointer;}
+.err-msg{background:rgba(192,48,32,.15);border:1px solid rgba(192,48,32,.3);border-radius:8px;padding:10px 14px;font-size:.78rem;color:#ff8878;margin-bottom:10px;display:none;}
+
+/* Tabs */
+.tabs{display:flex;background:rgba(0,0,0,.4);border-bottom:1px solid rgba(232,176,32,.2);}
+.tab{flex:1;padding:11px 4px;text-align:center;font-size:.65rem;cursor:pointer;color:var(–fog);letter-spacing:1px;border-bottom:2px solid transparent;transition:all .2s;}
+.tab.active{color:var(–sun);border-bottom-color:var(–sun);background:rgba(232,176,32,.07);}
+.tab-icon{font-size:1.1rem;display:block;margin-bottom:2px;}
+
+.panel{display:none;padding:16px;padding-bottom:40px;}
+.panel.active{display:block;}
+
+/* Cards */
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(–r);padding:14px;margin-bottom:10px;}
+.sec-title{font-family:‘Barlow Condensed’,sans-serif;font-weight:700;font-size:1rem;letter-spacing:3px;color:var(–sun);text-transform:uppercase;margin-bottom:12px;}
+
+/* Month nav */
+.month-nav{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:8px 12px;margin-bottom:12px;}
+.month-nav-btn{background:none;border:none;color:var(–sun);font-size:1.4rem;cursor:pointer;padding:0 8px;}
+.month-nav-label{font-family:‘Barlow Condensed’,sans-serif;font-weight:700;font-size:1rem;letter-spacing:2px;}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.stat{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:10px 6px;text-align:center;}
+.stat-n{font-family:‘Barlow Condensed’,sans-serif;font-weight:700;font-size:1.7rem;color:var(–sun);line-height:1;}
+.stat-l{font-size:.58rem;color:var(–fog);letter-spacing:1px;text-transform:uppercase;margin-top:3px;}
+
+/* Rank list */
+.rank-list{display:flex;flex-direction:column;gap:6px;}
+.rc{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-left:3px solid transparent;border-radius:var(–r);}
+.rc.r1{border-left-color:var(–sun);background:rgba(232,176,32,.06);}
+.rc.r2{border-left-color:#9ab0b8;}
+.rc.r3{border-left-color:#a07850;}
+.rc-pos{font-family:‘Barlow Condensed’,sans-serif;font-weight:900;font-size:1.6rem;min-width:28px;text-align:center;line-height:1;color:rgba(240,232,208,.25);}
+.r1 .rc-pos{color:var(–sun);}
+.r2 .rc-pos{color:#9ab0b8;}
+.r3 .rc-pos{color:#a07850;}
+.rc-av{width:32px;height:32px;border-radius:50%;background:var(–moss);border:2px solid var(–fern);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;overflow:hidden;}
+.rc-av img{width:100%;height:100%;object-fit:cover;}
+.rc-info{flex:1;min-width:0;}
+.rc-dog{font-weight:700;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rc-owner{font-size:.65rem;color:var(–fog);margin-top:1px;}
+.rc-right{text-align:right;flex-shrink:0;}
+.rc-time{font-family:‘Barlow Condensed’,sans-serif;font-weight:700;font-size:1.1rem;color:var(–lime);letter-spacing:1px;}
+.rc-count{font-size:.6rem;color:var(–fog);}
+
+/* Cat tabs */
+.cat-tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none;}
+.ctab{padding:5px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:20px;font-size:.68rem;cursor:pointer;white-space:nowrap;transition:all .2s;color:var(–fog);}
+.ctab.active{background:rgba(232,176,32,.2);border-color:var(–sun);color:var(–sun);}
+
+/* User list */
+.user-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:var(–r);margin-bottom:7px;}
+.u-av{width:38px;height:38px;border-radius:50%;background:var(–moss);border:2px solid var(–fern);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;overflow:hidden;}
+.u-av img{width:100%;height:100%;object-fit:cover;}
+.u-info{flex:1;min-width:0;}
+.u-dog{font-weight:700;font-size:.88rem;}
+.u-owner{font-size:.65rem;color:var(–fog);margin-top:1px;}
+.u-cat{font-size:.6rem;background:rgba(126,184,50,.15);color:var(–lime);padding:2px 8px;border-radius:10px;display:inline-block;margin-top:3px;}
+.u-stats{text-align:right;font-size:.65rem;color:var(–fog);}
+
+/* Run list */
+.run-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:var(–r);margin-bottom:6px;}
+.run-info{flex:1;min-width:0;}
+.run-dog{font-weight:700;font-size:.85rem;}
+.run-meta{font-size:.65rem;color:var(–fog);margin-top:2px;}
+.run-time{font-family:‘Barlow Condensed’,sans-serif;font-weight:700;font-size:1.1rem;color:var(–lime);text-align:right;flex-shrink:0;}
+.del-btn{background:rgba(192,48,32,.15);border:1px solid rgba(192,48,32,.3);color:#ff8878;font-size:.68rem;padding:4px 10px;border-radius:6px;cursor:pointer;white-space:nowrap;font-family:‘Noto Sans JP’,sans-serif;}
+.del-btn:hover{background:rgba(192,48,32,.3);}
+
+/* Search */
+.search-bar{width:100%;padding:10px 13px;background:rgba(0,0,0,.4);border:1.5px solid rgba(255,255,255,.12);border-radius:9px;color:var(–cream);font-size:.9rem;font-family:‘Noto Sans JP’,sans-serif;outline:none;margin-bottom:12px;-webkit-text-fill-color:var(–cream);}
+.search-bar::placeholder{color:var(–fog);}
+
+.empty{text-align:center;padding:30px;color:var(–fog);font-size:.82rem;}
+.empty .ei{font-size:2rem;margin-bottom:8px;}
+
+.logout-btn{width:100%;padding:11px;background:rgba(192,48,32,.12);border:1px solid rgba(192,48,32,.25);border-radius:var(–r);color:#ff8878;font-family:‘Noto Sans JP’,sans-serif;font-size:.82rem;cursor:pointer;margin-top:16px;}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(8px);padding:10px 22px;border-radius:24px;font-weight:700;font-size:.83rem;z-index:9998;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.tok-ok{background:var(–lime);color:#0a1a05;}
+.tok-err{background:var(–red);color:#fff;}
+.tok-info{background:#4a9ec4;color:#0a1a20;}
+</style>
+
+</head>
+<body>
+
+<div id="loading">
+  <div class="loading-logo">⚙️ ADMIN</div>
+  <div style="font-size:.7rem;color:var(--fog);letter-spacing:3px;margin-top:8px;">読み込み中...</div>
+</div>
+
+<!-- AUTH -->
+
+<div id="auth-screen" style="display:none;">
+  <div class="topbar">
+    <div class="wm">🐾 TRAIL RUSH</div>
+    <div class="admin-badge">ADMIN</div>
+  </div>
+  <div class="auth-wrap">
+    <div class="auth-title">管理者ログイン</div>
+    <div class="err-msg" id="err-login"></div>
+    <div class="field"><label>メールアドレス</label><input type="email" id="l-email" placeholder="admin@example.com"></div>
+    <div class="field"><label>パスワード</label><input type="password" id="l-pass" placeholder="••••••••"></div>
+    <button class="sbtn" onclick="doLogin()">ログイン</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+
+<div id="main-screen" style="display:none;">
+  <div class="topbar">
+    <div class="wm">⚙️ 管理画面</div>
+    <div class="admin-badge">ADMIN</div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('ranking',this)">
+      <span class="tab-icon">🏆</span>ランキング
+    </div>
+    <div class="tab" onclick="switchTab('records',this)">
+      <span class="tab-icon">📊</span>全記録
+    </div>
+    <div class="tab" onclick="switchTab('users',this)">
+      <span class="tab-icon">👤</span>ユーザー
+    </div>
+    <div class="tab" onclick="switchTab('settings',this)">
+      <span class="tab-icon">⚙️</span>設定
+    </div>
+  </div>
+
+  <!-- ランキングパネル -->
+
+  <div class="panel active" id="panel-ranking">
+    <div class="month-nav">
+      <button class="month-nav-btn" onclick="changeMonth('ranking',-1)">‹</button>
+      <div class="month-nav-label" id="rk-month-label">-</div>
+      <button class="month-nav-btn" id="rk-next-btn" onclick="changeMonth('ranking',1)">›</button>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="stat-n" id="rk-total">-</div><div class="stat-l">参加者</div></div>
+      <div class="stat"><div class="stat-n" id="rk-runs">-</div><div class="stat-l">総走行</div></div>
+      <div class="stat"><div class="stat-n" id="rk-best" style="font-size:1rem;">--:--</div><div class="stat-l">ベスト</div></div>
+    </div>
+    <div class="cat-tabs" id="rk-cat-tabs">
+      <div class="ctab active" onclick="setRkCat('全て',this)">全て</div>
+      <div class="ctab" onclick="setRkCat('小型犬',this)">小型犬</div>
+      <div class="ctab" onclick="setRkCat('中型犬',this)">中型犬</div>
+      <div class="ctab" onclick="setRkCat('大型犬',this)">大型犬</div>
+    </div>
+    <div class="rank-list" id="rk-list">
+      <div class="empty"><div class="ei">🐾</div>読み込み中...</div>
+    </div>
+  </div>
+
+  <!-- 全記録パネル -->
+
+  <div class="panel" id="panel-records">
+    <div class="month-nav">
+      <button class="month-nav-btn" onclick="changeMonth('records',-1)">‹</button>
+      <div class="month-nav-label" id="rec-month-label">-</div>
+      <button class="month-nav-btn" id="rec-next-btn" onclick="changeMonth('records',1)">›</button>
+    </div>
+    <input class="search-bar" id="rec-search" placeholder="🔍 犬の名前・オーナー名で検索" oninput="filterRecords()">
+    <div style="font-size:.65rem;color:var(--fog);margin-bottom:8px;" id="rec-count"></div>
+    <div id="rec-list">
+      <div class="empty"><div class="ei">🐾</div>読み込み中...</div>
+    </div>
+  </div>
+
+  <!-- ユーザーパネル -->
+
+  <div class="panel" id="panel-users">
+    <input class="search-bar" id="user-search" placeholder="🔍 犬の名前・オーナー名で検索" oninput="filterUsers()">
+    <div style="font-size:.65rem;color:var(--fog);margin-bottom:8px;" id="user-count"></div>
+    <div id="user-list">
+      <div class="empty"><div class="ei">🐾</div>読み込み中...</div>
+    </div>
+  </div>
+
+  <!-- 設定パネル -->
+
+  <div class="panel" id="panel-settings">
+    <div class="sec-title">⚙️ 設定</div>
+    <div class="card">
+      <div style="font-size:.8rem;margin-bottom:12px;color:var(--fog);">管理者アカウント</div>
+      <div style="font-size:.9rem;margin-bottom:16px;" id="admin-email">-</div>
+      <button class="logout-btn" onclick="doLogout()">ログアウト</button>
+    </div>
+    <div class="card" style="margin-top:12px;">
+      <div style="font-size:.8rem;color:var(--fog);line-height:1.8;">
+        <div>📱 参加者アプリ</div>
+        <a href="./index.html" style="color:var(--lime);font-size:.78rem;">→ index.html を開く</a>
+        <div style="margin-top:8px;">🔲 QRコード生成</div>
+        <a href="./qr.html" style="color:var(--lime);font-size:.78rem;">→ qr.html を開く</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, doc, getDoc, getDocs, deleteDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBrIS53Ahx5iBprFNXjUZ9Xy3N7DN2OCSU",
+  authDomain: "wanpeace-ee252.firebaseapp.com",
+  projectId: "wanpeace-ee252",
+  storageBucket: "wanpeace-ee252.firebasestorage.app",
+  messagingSenderId: "428302662863",
+  appId: "1:428302662863:web:4cbffd10c4982de9ce0bba"
+};
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+let currentUser = null;
+let rkMonthOffset  = 0;
+let recMonthOffset = 0;
+let rkCatFilter    = '全て';
+let allRecords     = [];
+let allUsers       = [];
+
+// ── Utils ──
+function fmt(ms) {
+  if(!ms||isNaN(ms)) return '--:--.-';
+  const t=Math.floor(ms/100);
+  const m=Math.floor(t/600);
+  const s=Math.floor((t%600)/10);
+  const d=t%10;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${d}`;
+}
+function getOffsetDate(offset=0) { const d=new Date(); d.setMonth(d.getMonth()+offset); return d; }
+function monthLabel(d=new Date()) { return `${d.getFullYear()}年${d.getMonth()+1}月`; }
+function monthKey(d=new Date()) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
+function showToast(msg,type='ok') {
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className=`toast tok-${type} show`;
+  clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'),2800);
+}
+function hideLoading() {
+  const el=document.getElementById('loading');
+  el.classList.add('hide'); setTimeout(()=>el.style.display='none',500);
+}
+
+// ── Auth ──
+onAuthStateChanged(auth, async user => {
+  if(user) {
+    currentUser = user;
+    document.getElementById('auth-screen').style.display='none';
+    document.getElementById('main-screen').style.display='block';
+    document.getElementById('admin-email').textContent=user.email;
+    loadRanking();
+    loadAllRecords();
+    loadUsers();
+  } else {
+    currentUser = null;
+    document.getElementById('auth-screen').style.display='block';
+    document.getElementById('main-screen').style.display='none';
+  }
+  hideLoading();
+});
+
+window.doLogin = async () => {
+  const email=document.getElementById('l-email').value.trim();
+  const pass=document.getElementById('l-pass').value;
+  const errEl=document.getElementById('err-login');
+  errEl.style.display='none';
+  if(!email||!pass){errEl.textContent='メールとパスワードを入力してください';errEl.style.display='block';return;}
+  try {
+    await signInWithEmailAndPassword(auth,email,pass);
+  } catch(e) {
+    errEl.textContent='ログインに失敗しました';errEl.style.display='block';
+  }
+};
+window.doLogout = async () => {
+  if(!confirm('ログアウトしますか？')) return;
+  await signOut(auth);
+};
+
+// ── Tabs ──
+window.switchTab = (name, el) => {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  el.classList.add('active');
+};
+
+// ── Month nav ──
+window.changeMonth = (type, delta) => {
+  if(type==='ranking') {
+    const n=rkMonthOffset+delta;
+    if(n>0) return;
+    rkMonthOffset=n;
+    loadRanking();
+  } else {
+    const n=recMonthOffset+delta;
+    if(n>0) return;
+    recMonthOffset=n;
+    loadAllRecords();
+  }
+};
+
+// ── Ranking ──
+window.setRkCat = (cat,el) => {
+  rkCatFilter=cat;
+  document.querySelectorAll('#rk-cat-tabs .ctab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderRanking();
+};
+
+let rkAllRuns=[];
+async function loadRanking() {
+  const d=getOffsetDate(rkMonthOffset);
+  const mk=monthKey(d);
+  document.getElementById('rk-month-label').textContent=monthLabel(d);
+  document.getElementById('rk-next-btn').style.opacity=rkMonthOffset>=0?'0.3':'1';
+  document.getElementById('rk-list').innerHTML='<div class="empty"><div class="ei">⏳</div>読み込み中...</div>';
+
+  try {
+    const q=query(collection(db,'runs'),where('month','==',mk));
+    const snap=await getDocs(q);
+    rkAllRuns=[];
+    snap.forEach(d=>rkAllRuns.push({id:d.id,...d.data()}));
+
+    // Fetch photos
+    const uids=[...new Set(rkAllRuns.map(r=>r.uid))];
+    const photoMap={};
+    await Promise.all(uids.map(async uid=>{
+      try{const us=await getDoc(doc(db,'users',uid));if(us.exists()&&us.data().photoURL)photoMap[uid]=us.data().photoURL;}catch(e){}
+    }));
+    rkAllRuns.forEach(r=>{ r._photo=photoMap[r.uid]||null; });
+
+    const totalRuns=rkAllRuns.length;
+    const bestMap={};const countMap={};const infoMap={};
+    rkAllRuns.forEach(r=>{
+      if(!bestMap[r.uid]||r.timeMs<bestMap[r.uid]){bestMap[r.uid]=r.timeMs;infoMap[r.uid]={dog:r.dog,name:r.name,cat:r.cat,photo:r._photo};}
+      countMap[r.uid]=(countMap[r.uid]||0)+1;
+    });
+    const entries=Object.entries(bestMap).map(([uid,t])=>({uid,timeMs:t,...infoMap[uid],count:countMap[uid]}));
+    entries.sort((a,b)=>a.timeMs-b.timeMs);
+
+    document.getElementById('rk-total').textContent=entries.length;
+    document.getElementById('rk-runs').textContent=totalRuns;
+    document.getElementById('rk-best').textContent=entries.length?fmt(entries[0].timeMs):'--:--';
+
+    window._rkEntries=entries;
+    renderRanking();
+  } catch(e){ console.error(e); }
+}
+
+function renderRanking() {
+  const entries=(window._rkEntries||[]).filter(e=>rkCatFilter==='全て'||e.cat===rkCatFilter);
+  const medals=['🥇','🥈','🥉'];
+  const list=document.getElementById('rk-list');
+  if(!entries.length){list.innerHTML='<div class="empty"><div class="ei">🐾</div>記録がありません</div>';return;}
+  list.innerHTML=entries.map((e,i)=>{
+    const cls=`rc ${i===0?'r1':i===1?'r2':i===2?'r3':''}`;
+    const av=e.photo?`<img src="${e.photo}">`:'🐾';
+    return `<div class="${cls}">
+      <div class="rc-pos">${i<3?medals[i]:i+1}</div>
+      <div class="rc-av">${av}</div>
+      <div class="rc-info"><div class="rc-dog">${e.dog}</div><div class="rc-owner">👤 ${e.name} ・ ${e.cat}</div></div>
+      <div class="rc-right"><div class="rc-time">${fmt(e.timeMs)}</div><div class="rc-count">${e.count}回走行</div></div>
+    </div>`;
+  }).join('');
+}
+
+// ── All Records ──
+async function loadAllRecords() {
+  const d=getOffsetDate(recMonthOffset);
+  const mk=monthKey(d);
+  document.getElementById('rec-month-label').textContent=monthLabel(d);
+  document.getElementById('rec-next-btn').style.opacity=recMonthOffset>=0?'0.3':'1';
+  document.getElementById('rec-list').innerHTML='<div class="empty"><div class="ei">⏳</div>読み込み中...</div>';
+
+  try {
+    const q=query(collection(db,'runs'),where('month','==',mk));
+    const snap=await getDocs(q);
+    allRecords=[];
+    snap.forEach(d=>allRecords.push({id:d.id,...d.data()}));
+    allRecords.sort((a,b)=>{
+      const ta=a.createdAt?.toMillis?a.createdAt.toMillis():0;
+      const tb=b.createdAt?.toMillis?b.createdAt.toMillis():0;
+      return tb-ta;
+    });
+    filterRecords();
+  } catch(e){ console.error(e); }
+}
+
+window.filterRecords = () => {
+  const q=(document.getElementById('rec-search').value||'').toLowerCase();
+  const filtered=allRecords.filter(r=>
+    !q || r.dog?.toLowerCase().includes(q) || r.name?.toLowerCase().includes(q)
+  );
+  document.getElementById('rec-count').textContent=`${filtered.length}件`;
+  const mons=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const list=document.getElementById('rec-list');
+  if(!filtered.length){list.innerHTML='<div class="empty"><div class="ei">🐾</div>記録がありません</div>';return;}
+  list.innerHTML=filtered.map(r=>{
+    const d=r.createdAt?.toDate?r.createdAt.toDate():new Date();
+    return `<div class="run-item">
+      <div class="run-info">
+        <div class="run-dog">🐾 ${r.dog}</div>
+        <div class="run-meta">👤 ${r.name} ・ ${r.cat} ・ ${String(d.getDate()).padStart(2,'0')} ${mons[d.getMonth()]}</div>
+      </div>
+      <div class="run-time">${fmt(r.timeMs)}</div>
+      <button class="del-btn" onclick="deleteRecord('${r.id}','${r.dog}')">削除</button>
+    </div>`;
+  }).join('');
+};
+
+window.deleteRecord = async (id, dog) => {
+  if(!confirm(`🐾 ${dog} の記録を削除しますか？`)) return;
+  try {
+    await deleteDoc(doc(db,'runs',id));
+    allRecords=allRecords.filter(r=>r.id!==id);
+    filterRecords();
+    loadRanking();
+    showToast('記録を削除しました');
+  } catch(e){ showToast('削除に失敗しました','err'); }
+};
+
+// ── Users ──
+async function loadUsers() {
+  try {
+    const snap=await getDocs(collection(db,'users'));
+    allUsers=[];
+    snap.forEach(d=>allUsers.push({id:d.id,...d.data()}));
+
+    // 各ユーザーの走行数を取得
+    const mk=monthKey();
+    const runsSnap=await getDocs(query(collection(db,'runs'),where('month','==',mk)));
+    const countMap={};
+    runsSnap.forEach(d=>{ const r=d.data(); countMap[r.uid]=(countMap[r.uid]||0)+1; });
+    allUsers.forEach(u=>{ u._runs=countMap[u.id]||0; });
+    allUsers.sort((a,b)=>b._runs-a._runs);
+
+    filterUsers();
+  } catch(e){ console.error(e); }
+}
+
+window.filterUsers = () => {
+  const q=(document.getElementById('user-search').value||'').toLowerCase();
+  const filtered=allUsers.filter(u=>
+    !q || u.dog?.toLowerCase().includes(q) || u.name?.toLowerCase().includes(q)
+  );
+  document.getElementById('user-count').textContent=`${filtered.length}人`;
+  const list=document.getElementById('user-list');
+  if(!filtered.length){list.innerHTML='<div class="empty"><div class="ei">🐾</div>ユーザーがいません</div>';return;}
+  list.innerHTML=filtered.map(u=>{
+    const av=u.photoURL?`<img src="${u.photoURL}">`:'🐾';
+    return `<div class="user-item">
+      <div class="u-av">${av}</div>
+      <div class="u-info">
+        <div class="u-dog">🐾 ${u.dog||'-'}</div>
+        <div class="u-owner">👤 ${u.name||'-'}</div>
+        <div class="u-cat">${u.cat||'-'}</div>
+      </div>
+      <div class="u-stats">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;color:var(--sun);">${u._runs}</div>
+        <div>今月走行</div>
+      </div>
+    </div>`;
+  }).join('');
+};
+</script>
+
+</body>
+</html>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --soil:#1c1208;--bark:#2a1f0e;--moss:#2d4a1e;--fern:#4a7c35;
+  --lime:#7eb832;--sun:#e8b020;--ember:#d45f1a;--red:#c03020;
+  --cream:#f0e8d0;--fog:rgba(240,232,208,0.5);--r:12px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--soil);color:var(--cream);min-height:100vh;max-width:480px;margin:0 auto;}
+
+#loading{position:fixed;inset:0;background:var(–soil);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .5s;}
+#loading.hide{opacity:0;pointer-events:none;}
+.loading-logo{font-family:‘Barlow Condensed’,sans-serif;font-weight:900;font-size:2.5rem;letter-spacing:6px;color:var(–sun);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+.topbar{position:sticky;top:0;z-index:100;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;background:var(–bark);border-bottom:2px solid var(–sun);}
+.wm{font-family:‘Barlow Condensed’,sans-serif;font-weight:900;font-size:1.3rem;letter-spacing:3px;color:var(–sun);}
+.admin-badge{background:rgba(232,176,32,.2);border:1px solid rgba(232,176,32,.4);color:var(–sun);font-size:.62rem;padding:3px 10px;border-radius:12px;letter-spacing:2px;}
+
+/* Auth */
+.auth-wrap{padding:40px 20px;}
+.auth-title{font-family:‘Barlow Condensed’,sans-serif;font-size:1.8rem;letter-spacing:3px;color:var(–sun);margin-bottom:20px;text-align:center;}
+.field{margin-bottom:12px;}
+.field label{display:block;font-size:.65rem;letter-spacing:1.5px;color:var(–sun);text-transform:uppercase;margin-bottom:5px;}
+.field input{width:100%;padding:12px 14px;background:rgba(0,0,0,.45);border:1.5px solid rgba(255,255,255,.12);border-radius:9px;color:var(–cream);font-size:.95rem;font-family:‘Noto Sans JP’,sans-serif;outline:none;-webkit-text-fill-color:var(–cream);}
+.field input:focus{border-color:var(–sun);}
+.sbtn{width:100%;padding:13px;background:linear-gradient(135deg,#8a6010,var(–sun));border:none;border-radius:var(–r);font-family:‘Barlow Condensed’,sans-serif;font-weight:700;font-size:1.1rem;letter-spacing:3px;color:#1a0e00;cursor:pointer;}
+.err-msg{background:rgba(192,48,32,.15);border:1px solid rgba(192,48,32,.3);border-radius:8px;padding:10px 14px;font-size:.78rem;color:#ff8878;margin-bottom:10px;display:none;}
+
+/* Tabs */
+.tabs{display:flex;background:rgba(0,0,0,.4);border-bottom:1px solid rgba(232,176,32,.2);}
+.tab{flex:1;padding:11px 4px;text-align:center;font-size:.65rem;cursor:pointer;color:var(–fog);letter-spacing:1px;border-bottom:2px solid transparent;transition:all .2s;}
+.tab.active{color:var(–sun);border-bottom-color:var(–sun);background:rgba(232,176,32,.07);}
+.tab-icon{font-size:1.1rem;display:block;margin-bottom:2px;}
+
+.panel{display:none;padding:16px;padding-bottom:40px;}
+.panel.active{display:block;}
+
+/* Cards */
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(–r);padding:14px;margin-bottom:10px;}
+.sec-title{font-family:‘Barlow Condensed’,sans-serif;font-weight:700;font-size:1rem;letter-spacing:3px;color:var(–sun);text-transform:uppercase;margin-bottom:12px;}
+
+/* Month nav */
+.month-nav{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:8px 12px;margin-bottom:12px;}
+.month-nav-btn{background:none;border:none;color:var(–sun);font-size:1.4rem;cursor:pointer;padding:0 8px;}
+.month-nav-label{font-family:‘Barlow Condensed’,sans-serif;font-weight:700;font-size:1rem;letter-spacing:2px;}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.stat{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:10px 6px;text-align:center;}
+.stat-n{font-family:‘Barlow Condensed’,sans-serif;font-weight:700;font-size:1.7rem;color:var(–sun);line-height:1;}
+.stat-l{font-size:.58rem;color:var(–fog);letter-spacing:1px;text-transform:uppercase;margin-top:3px;}
+
+/* Rank list */
+.rank-list{display:flex;flex-direction:column;gap:6px;}
+.rc{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-left:3px solid transparent;border-radius:var(–r);}
+.rc.r1{border-left-color:var(–sun);background:rgba(232,176,32,.06);}
+.rc.r2{border-left-color:#9ab0b8;}
+.rc.r3{border-left-color:#a07850;}
+.rc-pos{font-family:‘Barlow Condensed’,sans-serif;font-weight:900;font-size:1.6rem;min-width:28px;text-align:center;line-height:1;color:rgba(240,232,208,.25);}
+.r1 .rc-pos{color:var(–sun);}
+.r2 .rc-pos{color:#9ab0b8;}
+.r3 .rc-pos{color:#a07850;}
+.rc-av{width:32px;height:32px;border-radius:50%;background:var(–moss);border:2px solid var(–fern);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;overflow:hidden;}
+.rc-av img{width:100%;height:100%;object-fit:cover;}
+.rc-info{flex:1;min-width:0;}
+.rc-dog{font-weight:700;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rc-owner{font-size:.65rem;color:var(–fog);margin-top:1px;}
+.rc-right{text-align:right;flex-shrink:0;}
+.rc-time{font-family:‘Barlow Condensed’,sans-serif;font-weight:700;font-size:1.1rem;color:var(–lime);letter-spacing:1px;}
+.rc-count{font-size:.6rem;color:var(–fog);}
+
+/* Cat tabs */
+.cat-tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none;}
+.ctab{padding:5px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:20px;font-size:.68rem;cursor:pointer;white-space:nowrap;transition:all .2s;color:var(–fog);}
+.ctab.active{background:rgba(232,176,32,.2);border-color:var(–sun);color:var(–sun);}
+
+/* User list */
+.user-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:var(–r);margin-bottom:7px;}
+.u-av{width:38px;height:38px;border-radius:50%;background:var(–moss);border:2px solid var(–fern);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;overflow:hidden;}
+.u-av img{width:100%;height:100%;object-fit:cover;}
+.u-info{flex:1;min-width:0;}
+.u-dog{font-weight:700;font-size:.88rem;}
+.u-owner{font-size:.65rem;color:var(–fog);margin-top:1px;}
+.u-cat{font-size:.6rem;background:rgba(126,184,50,.15);color:var(–lime);padding:2px 8px;border-radius:10px;display:inline-block;margin-top:3px;}
+.u-stats{text-align:right;font-size:.65rem;color:var(–fog);}
+
+/* Run list */
+.run-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:var(–r);margin-bottom:6px;}
+.run-info{flex:1;min-width:0;}
+.run-dog{font-weight:700;font-size:.85rem;}
+.run-meta{font-size:.65rem;color:var(–fog);margin-top:2px;}
+.run-time{font-family:‘Barlow Condensed’,sans-serif;font-weight:700;font-size:1.1rem;color:var(–lime);text-align:right;flex-shrink:0;}
+.del-btn{background:rgba(192,48,32,.15);border:1px solid rgba(192,48,32,.3);color:#ff8878;font-size:.68rem;padding:4px 10px;border-radius:6px;cursor:pointer;white-space:nowrap;font-family:‘Noto Sans JP’,sans-serif;}
+.del-btn:hover{background:rgba(192,48,32,.3);}
+
+/* Search */
+.search-bar{width:100%;padding:10px 13px;background:rgba(0,0,0,.4);border:1.5px solid rgba(255,255,255,.12);border-radius:9px;color:var(–cream);font-size:.9rem;font-family:‘Noto Sans JP’,sans-serif;outline:none;margin-bottom:12px;-webkit-text-fill-color:var(–cream);}
+.search-bar::placeholder{color:var(–fog);}
+
+.empty{text-align:center;padding:30px;color:var(–fog);font-size:.82rem;}
+.empty .ei{font-size:2rem;margin-bottom:8px;}
+
+.logout-btn{width:100%;padding:11px;background:rgba(192,48,32,.12);border:1px solid rgba(192,48,32,.25);border-radius:var(–r);color:#ff8878;font-family:‘Noto Sans JP’,sans-serif;font-size:.82rem;cursor:pointer;margin-top:16px;}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(8px);padding:10px 22px;border-radius:24px;font-weight:700;font-size:.83rem;z-index:9998;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.tok-ok{background:var(–lime);color:#0a1a05;}
+.tok-err{background:var(–red);color:#fff;}
+.tok-info{background:#4a9ec4;color:#0a1a20;}
+</style>
+
+</head>
+<body>
+
+<div id="loading">
+  <div class="loading-logo">⚙️ ADMIN</div>
+  <div style="font-size:.7rem;color:var(--fog);letter-spacing:3px;margin-top:8px;">読み込み中...</div>
+</div>
+
+<!-- AUTH -->
+
+<div id="auth-screen" style="display:none;">
+  <div class="topbar">
+    <div class="wm">🐾 TRAIL RUSH</div>
+    <div class="admin-badge">ADMIN</div>
+  </div>
+  <div class="auth-wrap">
+    <div class="auth-title">管理者ログイン</div>
+    <div class="err-msg" id="err-login"></div>
+    <div class="field"><label>メールアドレス</label><input type="email" id="l-email" placeholder="admin@example.com"></div>
+    <div class="field"><label>パスワード</label><input type="password" id="l-pass" placeholder="••••••••"></div>
+    <button class="sbtn" onclick="doLogin()">ログイン</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+
+<div id="main-screen" style="display:none;">
+  <div class="topbar">
+    <div class="wm">⚙️ 管理画面</div>
+    <div class="admin-badge">ADMIN</div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('ranking',this)">
+      <span class="tab-icon">🏆</span>ランキング
+    </div>
+    <div class="tab" onclick="switchTab('records',this)">
+      <span class="tab-icon">📊</span>全記録
+    </div>
+    <div class="tab" onclick="switchTab('users',this)">
+      <span class="tab-icon">👤</span>ユーザー
+    </div>
+    <div class="tab" onclick="switchTab('settings',this)">
+      <span class="tab-icon">⚙️</span>設定
+    </div>
+  </div>
+
+  <!-- ランキングパネル -->
+
+  <div class="panel active" id="panel-ranking">
+    <div class="month-nav">
+      <button class="month-nav-btn" onclick="changeMonth('ranking',-1)">‹</button>
+      <div class="month-nav-label" id="rk-month-label">-</div>
+      <button class="month-nav-btn" id="rk-next-btn" onclick="changeMonth('ranking',1)">›</button>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="stat-n" id="rk-total">-</div><div class="stat-l">参加者</div></div>
+      <div class="stat"><div class="stat-n" id="rk-runs">-</div><div class="stat-l">総走行</div></div>
+      <div class="stat"><div class="stat-n" id="rk-best" style="font-size:1rem;">--:--</div><div class="stat-l">ベスト</div></div>
+    </div>
+    <div class="cat-tabs" id="rk-cat-tabs">
+      <div class="ctab active" onclick="setRkCat('全て',this)">全て</div>
+      <div class="ctab" onclick="setRkCat('小型犬',this)">小型犬</div>
+      <div class="ctab" onclick="setRkCat('中型犬',this)">中型犬</div>
+      <div class="ctab" onclick="setRkCat('大型犬',this)">大型犬</div>
+    </div>
+    <div class="rank-list" id="rk-list">
+      <div class="empty"><div class="ei">🐾</div>読み込み中...</div>
+    </div>
+  </div>
+
+  <!-- 全記録パネル -->
+
+  <div class="panel" id="panel-records">
+    <div class="month-nav">
+      <button class="month-nav-btn" onclick="changeMonth('records',-1)">‹</button>
+      <div class="month-nav-label" id="rec-month-label">-</div>
+      <button class="month-nav-btn" id="rec-next-btn" onclick="changeMonth('records',1)">›</button>
+    </div>
+    <input class="search-bar" id="rec-search" placeholder="🔍 犬の名前・オーナー名で検索" oninput="filterRecords()">
+    <div style="font-size:.65rem;color:var(--fog);margin-bottom:8px;" id="rec-count"></div>
+    <div id="rec-list">
+      <div class="empty"><div class="ei">🐾</div>読み込み中...</div>
+    </div>
+  </div>
+
+  <!-- ユーザーパネル -->
+
+  <div class="panel" id="panel-users">
+    <input class="search-bar" id="user-search" placeholder="🔍 犬の名前・オーナー名で検索" oninput="filterUsers()">
+    <div style="font-size:.65rem;color:var(--fog);margin-bottom:8px;" id="user-count"></div>
+    <div id="user-list">
+      <div class="empty"><div class="ei">🐾</div>読み込み中...</div>
+    </div>
+  </div>
+
+  <!-- 設定パネル -->
+
+  <div class="panel" id="panel-settings">
+    <div class="sec-title">⚙️ 設定</div>
+    <div class="card">
+      <div style="font-size:.8rem;margin-bottom:12px;color:var(--fog);">管理者アカウント</div>
+      <div style="font-size:.9rem;margin-bottom:16px;" id="admin-email">-</div>
+      <button class="logout-btn" onclick="doLogout()">ログアウト</button>
+    </div>
+    <div class="card" style="margin-top:12px;">
+      <div style="font-size:.8rem;color:var(--fog);line-height:1.8;">
+        <div>📱 参加者アプリ</div>
+        <a href="./index.html" style="color:var(--lime);font-size:.78rem;">→ index.html を開く</a>
+        <div style="margin-top:8px;">🔲 QRコード生成</div>
+        <a href="./qr.html" style="color:var(--lime);font-size:.78rem;">→ qr.html を開く</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, doc, getDoc, getDocs, deleteDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBrIS53Ahx5iBprFNXjUZ9Xy3N7DN2OCSU",
+  authDomain: "wanpeace-ee252.firebaseapp.com",
+  projectId: "wanpeace-ee252",
+  storageBucket: "wanpeace-ee252.firebasestorage.app",
+  messagingSenderId: "428302662863",
+  appId: "1:428302662863:web:4cbffd10c4982de9ce0bba"
+};
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+let currentUser = null;
+let rkMonthOffset  = 0;
+let recMonthOffset = 0;
+let rkCatFilter    = '全て';
+let allRecords     = [];
+let allUsers       = [];
+
+// ── Utils ──
+function fmt(ms) {
+  if(!ms||isNaN(ms)) return '--:--.-';
+  const t=Math.floor(ms/100);
+  const m=Math.floor(t/600);
+  const s=Math.floor((t%600)/10);
+  const d=t%10;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${d}`;
+}
+function getOffsetDate(offset=0) { const d=new Date(); d.setMonth(d.getMonth()+offset); return d; }
+function monthLabel(d=new Date()) { return `${d.getFullYear()}年${d.getMonth()+1}月`; }
+function monthKey(d=new Date()) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
+function showToast(msg,type='ok') {
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className=`toast tok-${type} show`;
+  clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'),2800);
+}
+function hideLoading() {
+  const el=document.getElementById('loading');
+  el.classList.add('hide'); setTimeout(()=>el.style.display='none',500);
+}
+
+// ── Auth ──
+onAuthStateChanged(auth, async user => {
+  if(user) {
+    currentUser = user;
+    document.getElementById('auth-screen').style.display='none';
+    document.getElementById('main-screen').style.display='block';
+    document.getElementById('admin-email').textContent=user.email;
+    loadRanking();
+    loadAllRecords();
+    loadUsers();
+  } else {
+    currentUser = null;
+    document.getElementById('auth-screen').style.display='block';
+    document.getElementById('main-screen').style.display='none';
+  }
+  hideLoading();
+});
+
+window.doLogin = async () => {
+  const email=document.getElementById('l-email').value.trim();
+  const pass=document.getElementById('l-pass').value;
+  const errEl=document.getElementById('err-login');
+  errEl.style.display='none';
+  if(!email||!pass){errEl.textContent='メールとパスワードを入力してください';errEl.style.display='block';return;}
+  try {
+    await signInWithEmailAndPassword(auth,email,pass);
+  } catch(e) {
+    errEl.textContent='ログインに失敗しました';errEl.style.display='block';
+  }
+};
+window.doLogout = async () => {
+  if(!confirm('ログアウトしますか？')) return;
+  await signOut(auth);
+};
+
+// ── Tabs ──
+window.switchTab = (name, el) => {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  el.classList.add('active');
+};
+
+// ── Month nav ──
+window.changeMonth = (type, delta) => {
+  if(type==='ranking') {
+    const n=rkMonthOffset+delta;
+    if(n>0) return;
+    rkMonthOffset=n;
+    loadRanking();
+  } else {
+    const n=recMonthOffset+delta;
+    if(n>0) return;
+    recMonthOffset=n;
+    loadAllRecords();
+  }
+};
+
+// ── Ranking ──
+window.setRkCat = (cat,el) => {
+  rkCatFilter=cat;
+  document.querySelectorAll('#rk-cat-tabs .ctab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderRanking();
+};
+
+let rkAllRuns=[];
+async function loadRanking() {
+  const d=getOffsetDate(rkMonthOffset);
+  const mk=monthKey(d);
+  document.getElementById('rk-month-label').textContent=monthLabel(d);
+  document.getElementById('rk-next-btn').style.opacity=rkMonthOffset>=0?'0.3':'1';
+  document.getElementById('rk-list').innerHTML='<div class="empty"><div class="ei">⏳</div>読み込み中...</div>';
+
+  try {
+    const q=query(collection(db,'runs'),where('month','==',mk));
+    const snap=await getDocs(q);
+    rkAllRuns=[];
+    snap.forEach(d=>rkAllRuns.push({id:d.id,...d.data()}));
+
+    // Fetch photos
+    const uids=[...new Set(rkAllRuns.map(r=>r.uid))];
+    const photoMap={};
+    await Promise.all(uids.map(async uid=>{
+      try{const us=await getDoc(doc(db,'users',uid));if(us.exists()&&us.data().photoURL)photoMap[uid]=us.data().photoURL;}catch(e){}
+    }));
+    rkAllRuns.forEach(r=>{ r._photo=photoMap[r.uid]||null; });
+
+    const totalRuns=rkAllRuns.length;
+    const bestMap={};const countMap={};const infoMap={};
+    rkAllRuns.forEach(r=>{
+      if(!bestMap[r.uid]||r.timeMs<bestMap[r.uid]){bestMap[r.uid]=r.timeMs;infoMap[r.uid]={dog:r.dog,name:r.name,cat:r.cat,photo:r._photo};}
+      countMap[r.uid]=(countMap[r.uid]||0)+1;
+    });
+    const entries=Object.entries(bestMap).map(([uid,t])=>({uid,timeMs:t,...infoMap[uid],count:countMap[uid]}));
+    entries.sort((a,b)=>a.timeMs-b.timeMs);
+
+    document.getElementById('rk-total').textContent=entries.length;
+    document.getElementById('rk-runs').textContent=totalRuns;
+    document.getElementById('rk-best').textContent=entries.length?fmt(entries[0].timeMs):'--:--';
+
+    window._rkEntries=entries;
+    renderRanking();
+  } catch(e){ console.error(e); }
+}
+
+function renderRanking() {
+  const entries=(window._rkEntries||[]).filter(e=>rkCatFilter==='全て'||e.cat===rkCatFilter);
+  const medals=['🥇','🥈','🥉'];
+  const list=document.getElementById('rk-list');
+  if(!entries.length){list.innerHTML='<div class="empty"><div class="ei">🐾</div>記録がありません</div>';return;}
+  list.innerHTML=entries.map((e,i)=>{
+    const cls=`rc ${i===0?'r1':i===1?'r2':i===2?'r3':''}`;
+    const av=e.photo?`<img src="${e.photo}">`:'🐾';
+    return `<div class="${cls}">
+      <div class="rc-pos">${i<3?medals[i]:i+1}</div>
+      <div class="rc-av">${av}</div>
+      <div class="rc-info"><div class="rc-dog">${e.dog}</div><div class="rc-owner">👤 ${e.name} ・ ${e.cat}</div></div>
+      <div class="rc-right"><div class="rc-time">${fmt(e.timeMs)}</div><div class="rc-count">${e.count}回走行</div></div>
+    </div>`;
+  }).join('');
+}
+
+// ── All Records ──
+async function loadAllRecords() {
+  const d=getOffsetDate(recMonthOffset);
+  const mk=monthKey(d);
+  document.getElementById('rec-month-label').textContent=monthLabel(d);
+  document.getElementById('rec-next-btn').style.opacity=recMonthOffset>=0?'0.3':'1';
+  document.getElementById('rec-list').innerHTML='<div class="empty"><div class="ei">⏳</div>読み込み中...</div>';
+
+  try {
+    const q=query(collection(db,'runs'),where('month','==',mk));
+    const snap=await getDocs(q);
+    allRecords=[];
+    snap.forEach(d=>allRecords.push({id:d.id,...d.data()}));
+    allRecords.sort((a,b)=>{
+      const ta=a.createdAt?.toMillis?a.createdAt.toMillis():0;
+      const tb=b.createdAt?.toMillis?b.createdAt.toMillis():0;
+      return tb-ta;
+    });
+    filterRecords();
+  } catch(e){ console.error(e); }
+}
+
+window.filterRecords = () => {
+  const q=(document.getElementById('rec-search').value||'').toLowerCase();
+  const filtered=allRecords.filter(r=>
+    !q || r.dog?.toLowerCase().includes(q) || r.name?.toLowerCase().includes(q)
+  );
+  document.getElementById('rec-count').textContent=`${filtered.length}件`;
+  const mons=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const list=document.getElementById('rec-list');
+  if(!filtered.length){list.innerHTML='<div class="empty"><div class="ei">🐾</div>記録がありません</div>';return;}
+  list.innerHTML=filtered.map(r=>{
+    const d=r.createdAt?.toDate?r.createdAt.toDate():new Date();
+    return `<div class="run-item">
+      <div class="run-info">
+        <div class="run-dog">🐾 ${r.dog}</div>
+        <div class="run-meta">👤 ${r.name} ・ ${r.cat} ・ ${String(d.getDate()).padStart(2,'0')} ${mons[d.getMonth()]}</div>
+      </div>
+      <div class="run-time">${fmt(r.timeMs)}</div>
+      <button class="del-btn" onclick="deleteRecord('${r.id}','${r.dog}')">削除</button>
+    </div>`;
+  }).join('');
+};
+
+window.deleteRecord = async (id, dog) => {
+  if(!confirm(`🐾 ${dog} の記録を削除しますか？`)) return;
+  try {
+    await deleteDoc(doc(db,'runs',id));
+    allRecords=allRecords.filter(r=>r.id!==id);
+    filterRecords();
+    loadRanking();
+    showToast('記録を削除しました');
+  } catch(e){ showToast('削除に失敗しました','err'); }
+};
+
+// ── Users ──
+async function loadUsers() {
+  try {
+    const snap=await getDocs(collection(db,'users'));
+    allUsers=[];
+    snap.forEach(d=>allUsers.push({id:d.id,...d.data()}));
+
+    // 各ユーザーの走行数を取得
+    const mk=monthKey();
+    const runsSnap=await getDocs(query(collection(db,'runs'),where('month','==',mk)));
+    const countMap={};
+    runsSnap.forEach(d=>{ const r=d.data(); countMap[r.uid]=(countMap[r.uid]||0)+1; });
+    allUsers.forEach(u=>{ u._runs=countMap[u.id]||0; });
+    allUsers.sort((a,b)=>b._runs-a._runs);
+
+    filterUsers();
+  } catch(e){ console.error(e); }
+}
+
+window.filterUsers = () => {
+  const q=(document.getElementById('user-search').value||'').toLowerCase();
+  const filtered=allUsers.filter(u=>
+    !q || u.dog?.toLowerCase().includes(q) || u.name?.toLowerCase().includes(q)
+  );
+  document.getElementById('user-count').textContent=`${filtered.length}人`;
+  const list=document.getElementById('user-list');
+  if(!filtered.length){list.innerHTML='<div class="empty"><div class="ei">🐾</div>ユーザーがいません</div>';return;}
+  list.innerHTML=filtered.map(u=>{
+    const av=u.photoURL?`<img src="${u.photoURL}">`:'🐾';
+    return `<div class="user-item">
+      <div class="u-av">${av}</div>
+      <div class="u-info">
+        <div class="u-dog">🐾 ${u.dog||'-'}</div>
+        <div class="u-owner">👤 ${u.name||'-'}</div>
+        <div class="u-cat">${u.cat||'-'}</div>
+      </div>
+      <div class="u-stats">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;color:var(--sun);">${u._runs}</div>
+        <div>今月走行</div>
+      </div>
+    </div>`;
+  }).join('');
+};
+</script>
+
+</body>
+</html>

@@ -325,6 +325,12 @@ body::before{
       <div class="sec-title">📊 走行記録</div>
       <div class="month-tag" id="rec-month-tag"></div>
     </div>
+    <!-- 月切り替え -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:8px 12px;">
+      <button onclick="changeRecordMonth(-1)" style="background:none;border:none;color:var(--lime);font-size:1.4rem;cursor:pointer;padding:0 8px;">‹</button>
+      <div id="rec-month-nav" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;letter-spacing:2px;color:var(--cream);"></div>
+      <button onclick="changeRecordMonth(1)" id="rec-next-btn" style="background:none;border:none;color:var(--lime);font-size:1.4rem;cursor:pointer;padding:0 8px;">›</button>
+    </div>
     <div id="rec-list"><div class="empty"><div class="ei">🐾</div>まだ記録がありません</div></div>
   </div>
   <button class="logout-btn" onclick="doLogout()">ログアウト</button>
@@ -369,6 +375,12 @@ body::before{
   <div style="padding:0 16px 10px;">
     <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.7rem;letter-spacing:3px;" id="rank-title">月間ランキング</div>
     <div style="font-size:.7rem;color:var(--fog);margin-top:2px;" id="rank-period">読み込み中...</div>
+  </div>
+  <!-- 月切り替え -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin:0 16px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:8px 12px;">
+    <button onclick="changeRankMonth(-1)" style="background:none;border:none;color:var(--lime);font-size:1.4rem;cursor:pointer;padding:0 8px;">‹</button>
+    <div id="rank-month-nav" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;letter-spacing:2px;color:var(--cream);"></div>
+    <button onclick="changeRankMonth(1)" id="rank-next-btn" style="background:none;border:none;color:var(--lime);font-size:1.4rem;cursor:pointer;padding:0 8px;">›</button>
   </div>
   <div class="cat-tabs">
     <div class="ctab active" onclick="setCat('全て',this)">全て</div>
@@ -435,6 +447,8 @@ let timerState  = 'wait';
 let startTs     = null;
 let timerIv     = null;
 let catFilter   = '全て';
+let recordMonthOffset = 0;  // 0=今月, -1=先月, -2=2ヶ月前
+let rankMonthOffset   = 0;
 
 function fmt(ms) {
   if(ms==null||isNaN(ms)) return '--:--.-';
@@ -444,6 +458,11 @@ function fmt(ms) {
   const d=t%10;
   return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${d}`;
 }
+function getOffsetDate(offset=0) {
+  const d=new Date();
+  d.setMonth(d.getMonth()+offset);
+  return d;
+}
 function monthLabel(d=new Date()) { return `${d.getFullYear()}年${d.getMonth()+1}月`; }
 function monthKey(d=new Date()) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
 function periodStr(d=new Date()) {
@@ -451,6 +470,20 @@ function periodStr(d=new Date()) {
   const last=new Date(y,m,0).getDate();
   return `${y}/${String(m).padStart(2,'0')}/01 〜 ${y}/${String(m).padStart(2,'0')}/${last} ・ ベストタイム順`;
 }
+
+// 月切り替え
+window.changeRecordMonth = (delta) => {
+  const newOffset = recordMonthOffset + delta;
+  if(newOffset > 0) return; // 未来は不可
+  recordMonthOffset = newOffset;
+  loadRecords();
+};
+window.changeRankMonth = (delta) => {
+  const newOffset = rankMonthOffset + delta;
+  if(newOffset > 0) return;
+  rankMonthOffset = newOffset;
+  loadRanking();
+};
 function showToast(msg,type='ok') {
   const el=document.getElementById('toast');
   el.textContent=msg; el.className=`toast tok-${type} show`;
@@ -898,10 +931,17 @@ async function loadRecords() {
   document.getElementById('p-dog').textContent=userProfile.dog;
   document.getElementById('p-owner').textContent=userProfile.name&&userProfile.name!=='オーナー'?`👤 ${userProfile.name}`:'';
   document.getElementById('p-cat').textContent=userProfile.cat;
-  document.getElementById('rec-month-tag').textContent=monthLabel();
   if(userProfile.photoURL) updateAvatarUI(userProfile.photoURL);
+
+  const d=getOffsetDate(recordMonthOffset);
+  const mk=monthKey(d);
+  const ml=monthLabel(d);
+  document.getElementById('rec-month-tag').textContent=ml;
+  document.getElementById('rec-month-nav').textContent=ml;
+  // 今月以降は「›」を薄くする
+  document.getElementById('rec-next-btn').style.opacity = recordMonthOffset >= 0 ? '0.3' : '1';
+
   try {
-    const mk=monthKey();
     const q=query(collection(db,'runs'),where('uid','==',currentUser.uid),where('month','==',mk));
     const snap=await getDocs(q);
     const runs=[];
@@ -954,9 +994,12 @@ window.setCat = (cat,el) => {
 };
 async function loadRanking() {
   if(!currentUser) return;
-  const mk=monthKey();
-  document.getElementById('rank-title').textContent=`${monthLabel()} ランキング`;
-  document.getElementById('rank-period').textContent=periodStr();
+  const rd=getOffsetDate(rankMonthOffset);
+  const mk=monthKey(rd);
+  document.getElementById('rank-title').textContent=`${monthLabel(rd)} ランキング`;
+  document.getElementById('rank-period').textContent=periodStr(rd);
+  document.getElementById('rank-month-nav').textContent=monthLabel(rd);
+  document.getElementById('rank-next-btn').style.opacity = rankMonthOffset >= 0 ? '0.3' : '1';
   try {
     const q=query(collection(db,'runs'),where('month','==',mk));
     const snap=await getDocs(q);

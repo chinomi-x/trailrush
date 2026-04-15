@@ -38,25 +38,26 @@ body::before{
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 #loading{position:fixed;inset:0;background:var(--soil);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .5s;}
 #loading.hide{opacity:0;pointer-events:none;}
-.loading-logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:3rem;letter-spacing:6px;color:var(--lime);text-shadow:0 0 30px rgba(126,184,50,.5);animation:pulse 1.5s infinite;}
+.loading-logo{animation:pulse 1.5s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-.loading-sub{font-size:.75rem;color:var(--fog);letter-spacing:3px;margin-top:8px;}
+.loading-sub{font-size:.75rem;color:var(--fog);letter-spacing:3px;margin-top:12px;}
 .nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:linear-gradient(0deg,rgba(14,10,4,.98) 70%,transparent);padding:8px 0 22px;display:none;justify-content:space-around;z-index:200;}
 .nav.show{display:flex;}
 .ni{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 16px;border-radius:10px;transition:all .2s;color:rgba(240,232,208,.3);font-size:.58rem;letter-spacing:1px;text-transform:uppercase;}
 .ni.active{color:var(--lime);}
 .ni-icon{font-size:1.35rem;}
-.topbar{position:sticky;top:0;z-index:100;padding:13px 18px 11px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,var(--soil) 55%,transparent);}
+.topbar{position:sticky;top:0;z-index:100;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,var(--soil) 55%,transparent);}
+.logo-img{height:28px;object-fit:contain;}
 .wm{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.5rem;letter-spacing:4px;color:var(--lime);text-shadow:0 0 20px rgba(126,184,50,.4);}
 .wm em{color:var(--sun);font-style:normal;}
 .card{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);border-radius:var(--r);padding:16px;margin-bottom:10px;}
 .sec{padding:16px 16px 4px;}
 .sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
 .sec-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.05rem;letter-spacing:3px;color:var(--lime);text-transform:uppercase;}
-.auth-hero{height:210px;background:linear-gradient(160deg,var(--moss) 0%,var(--bark) 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden;}
+.auth-hero{height:230px;background:linear-gradient(160deg,var(--moss) 0%,var(--bark) 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden;}
 .auth-hero::before{content:'🌲🐾🌲';font-size:2.5rem;position:absolute;bottom:8px;letter-spacing:10px;opacity:.15;}
-.auth-logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:3rem;letter-spacing:6px;color:var(--lime);text-shadow:0 0 28px rgba(126,184,50,.5);line-height:1;}
-.auth-tag{font-size:.72rem;color:var(--fog);letter-spacing:2px;margin-top:6px;}
+.auth-logo-img{height:80px;object-fit:contain;filter:brightness(0) invert(1);margin-bottom:10px;}
+.auth-tag{font-size:.68rem;color:var(--fog);letter-spacing:2px;margin-top:4px;}
 .auth-tabs{display:flex;margin:18px 16px 0;background:rgba(255,255,255,.05);border-radius:10px;padding:4px;gap:4px;}
 .atab{flex:1;padding:9px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:.88rem;letter-spacing:2px;cursor:pointer;border-radius:7px;transition:all .2s;color:var(--fog);}
 .atab.active{background:var(--fern);color:var(--cream);}
@@ -176,7 +177,9 @@ body::before{
 <body>
 
 <div id="loading">
-  <div class="loading-logo">🐾 GRC WAN PEACE</div>
+  <div class="loading-logo">
+    <img src="./logo.png" alt="GRC WAN PEACE ATHLETICS" style="height:70px;object-fit:contain;filter:brightness(0) invert(1);">
+  </div>
   <div class="loading-sub">読み込み中...</div>
 </div>
 
@@ -184,7 +187,7 @@ body::before{
 
 <div class="screen" id="screen-auth">
   <div class="auth-hero">
-    <div class="auth-logo" style="font-size:2rem;letter-spacing:3px;">GRC WAN PEACE<br><span style="font-size:1.4rem;color:var(--sun);">ATHLETICS</span></div>
+    <img src="./logo.png" alt="GRC WAN PEACE ATHLETICS" class="auth-logo-img">
     <div class="auth-tag">🐾 GRC WAN PEACE ATHLETICS</div>
   </div>
   <div class="auth-tabs">
@@ -219,7 +222,7 @@ body::before{
 
 <div class="screen" id="screen-home">
   <div class="topbar">
-    <div class="wm" style="font-size:.85rem;letter-spacing:1.5px;">GRC <em>WAN PEACE ATHLETICS</em></div>
+    <div style="display:flex;align-items:center;gap:8px;"><img src="./logo.png" alt="GRC WAN PEACE ATHLETICS" class="logo-img"><span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:1.5px;color:#f0e8d0;">WAN PEACE<br><span style="color:#e8b020;font-size:.75rem;">ATHLETICS</span></span></div>
     <div class="live-badge"><div class="live-dot"></div>LIVE</div>
   </div>
   <div class="hero">
@@ -250,7 +253,7 @@ body::before{
 
 <div class="screen" id="screen-timer">
   <div class="topbar">
-    <div class="wm" style="font-size:.85rem;letter-spacing:1.5px;">GRC <em>WAN PEACE ATHLETICS</em></div>
+    <div style="display:flex;align-items:center;gap:8px;"><img src="./logo.png" alt="GRC WAN PEACE ATHLETICS" class="logo-img"><span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:1.5px;color:#f0e8d0;">WAN PEACE<br><span style="color:#e8b020;font-size:.75rem;">ATHLETICS</span></span></div>
     <div style="font-size:.68rem;color:var(--fog);letter-spacing:2px;">タイム計測</div>
   </div>
   <div class="timer-hero">
@@ -274,10 +277,10 @@ body::before{
     <div class="step" id="s-fin"><div class="step-dot">🎉</div><div class="step-l">完走</div></div>
   </div>
   <div id="qr-instruction" style="padding:16px;">
-    <div id="qr-hint-start" onclick="openCamera('start')" style="background:linear-gradient(135deg,rgba(184,64,16,.2),rgba(212,95,26,.1));border:1px solid rgba(212,95,26,.4);border-radius:14px;padding:22px;text-align:center;cursor:pointer;active:opacity:.8;">
+    <div id="qr-hint-start" onclick="openCamera('start')" style="background:linear-gradient(135deg,rgba(184,64,16,.2),rgba(212,95,26,.1));border:1px solid rgba(212,95,26,.4);border-radius:14px;padding:22px;text-align:center;cursor:pointer;">
       <div style="font-size:3rem;margin-bottom:10px;">📷</div>
       <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.2rem;letter-spacing:2px;color:var(--ember);margin-bottom:8px;">スタート地点のQRを読み取ってください</div>
-      <div style="font-size:.78rem;color:var(--fog);line-height:1.7;">タップしてカメラを起動 →QRコードを読み取るとスタートします</div>
+      <div style="font-size:.78rem;color:var(--fog);line-height:1.7;">タップしてカメラを起動 → QRコードを読み取るとスタートします</div>
     </div>
     <div id="qr-hint-goal" onclick="openCamera('goal')" style="display:none;background:linear-gradient(135deg,rgba(45,74,30,.3),rgba(74,124,53,.15));border:1px solid rgba(126,184,50,.4);border-radius:14px;padding:22px;text-align:center;cursor:pointer;">
       <div style="font-size:3rem;margin-bottom:10px;">📷</div>
@@ -298,7 +301,7 @@ body::before{
 
 <div class="screen" id="screen-records">
   <div class="topbar">
-    <div class="wm" style="font-size:.85rem;letter-spacing:1.5px;">GRC <em>WAN PEACE ATHLETICS</em></div>
+    <div style="display:flex;align-items:center;gap:8px;"><img src="./logo.png" alt="GRC WAN PEACE ATHLETICS" class="logo-img"><span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:1.5px;color:#f0e8d0;">WAN PEACE<br><span style="color:#e8b020;font-size:.75rem;">ATHLETICS</span></span></div>
     <div style="font-size:.68rem;color:var(--fog);letter-spacing:2px;">自分の記録</div>
   </div>
   <div class="prof-hero">
@@ -325,7 +328,6 @@ body::before{
       <div class="sec-title">📊 走行記録</div>
       <div class="month-tag" id="rec-month-tag"></div>
     </div>
-    <!-- 月切り替え -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:8px 12px;">
       <button onclick="changeRecordMonth(-1)" style="background:none;border:none;color:var(--lime);font-size:1.4rem;cursor:pointer;padding:0 8px;">‹</button>
       <div id="rec-month-nav" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;letter-spacing:2px;color:var(--cream);"></div>
@@ -369,14 +371,13 @@ body::before{
 
 <div class="screen" id="screen-ranking">
   <div class="topbar">
-    <div class="wm" style="font-size:.85rem;letter-spacing:1.5px;">GRC <em>WAN PEACE ATHLETICS</em></div>
+    <div style="display:flex;align-items:center;gap:8px;"><img src="./logo.png" alt="GRC WAN PEACE ATHLETICS" class="logo-img"><span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:1.5px;color:#f0e8d0;">WAN PEACE<br><span style="color:#e8b020;font-size:.75rem;">ATHLETICS</span></span></div>
     <div class="live-badge"><div class="live-dot"></div>LIVE</div>
   </div>
   <div style="padding:0 16px 10px;">
     <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.7rem;letter-spacing:3px;" id="rank-title">月間ランキング</div>
     <div style="font-size:.7rem;color:var(--fog);margin-top:2px;" id="rank-period">読み込み中...</div>
   </div>
-  <!-- 月切り替え -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin:0 16px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:8px 12px;">
     <button onclick="changeRankMonth(-1)" style="background:none;border:none;color:var(--lime);font-size:1.4rem;cursor:pointer;padding:0 8px;">‹</button>
     <div id="rank-month-nav" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;letter-spacing:2px;color:var(--cream);"></div>
@@ -410,12 +411,10 @@ body::before{
 
 <div id="camera-modal" style="display:none;position:fixed;inset:0;z-index:600;background:#0c1a0c;">
   <div style="position:relative;width:100%;height:100%;display:flex;flex-direction:column;">
-    <!-- Label -->
     <div style="padding:16px;display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,.5);">
       <div id="camera-label" style="color:white;font-size:.82rem;letter-spacing:1px;font-weight:700;"></div>
       <button onclick="closeCamera()" style="background:rgba(255,255,255,.15);border:none;color:white;width:36px;height:36px;border-radius:50%;font-size:1.1rem;cursor:pointer;">✕</button>
     </div>
-    <!-- Scanner -->
     <div id="qr-reader" style="flex:1;width:100%;"></div>
     <div style="padding:16px;text-align:center;color:rgba(255,255,255,.6);font-size:.75rem;">QRコードをカメラに向けてください</div>
   </div>
@@ -447,7 +446,7 @@ let timerState  = 'wait';
 let startTs     = null;
 let timerIv     = null;
 let catFilter   = '全て';
-let recordMonthOffset = 0;  // 0=今月, -1=先月, -2=2ヶ月前
+let recordMonthOffset = 0;
 let rankMonthOffset   = 0;
 
 function fmt(ms) {
@@ -458,11 +457,7 @@ function fmt(ms) {
   const d=t%10;
   return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${d}`;
 }
-function getOffsetDate(offset=0) {
-  const d=new Date();
-  d.setMonth(d.getMonth()+offset);
-  return d;
-}
+function getOffsetDate(offset=0) { const d=new Date(); d.setMonth(d.getMonth()+offset); return d; }
 function monthLabel(d=new Date()) { return `${d.getFullYear()}年${d.getMonth()+1}月`; }
 function monthKey(d=new Date()) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
 function periodStr(d=new Date()) {
@@ -470,11 +465,9 @@ function periodStr(d=new Date()) {
   const last=new Date(y,m,0).getDate();
   return `${y}/${String(m).padStart(2,'0')}/01 〜 ${y}/${String(m).padStart(2,'0')}/${last} ・ ベストタイム順`;
 }
-
-// 月切り替え
 window.changeRecordMonth = (delta) => {
   const newOffset = recordMonthOffset + delta;
-  if(newOffset > 0) return; // 未来は不可
+  if(newOffset > 0) return;
   recordMonthOffset = newOffset;
   loadRecords();
 };
@@ -494,7 +487,6 @@ function hideLoading() {
   el.classList.add('hide'); setTimeout(()=>el.style.display='none',500);
 }
 
-// ── Auth State ──
 onAuthStateChanged(auth, async user => {
   if(user) {
     currentUser = user;
@@ -536,7 +528,6 @@ async function enterApp() {
     document.getElementById('screen-timer').classList.add('active');
     document.querySelectorAll('.ni').forEach((n,i)=>n.classList.toggle('active',i===1));
     history.replaceState(null,'',location.pathname);
-    // Firebaseからスタート時刻を復元（5秒タイムアウト）
     try {
       const timeout = new Promise((_,reject) => setTimeout(()=>reject(new Error('timeout')), 5000));
       const fetchSnap = getDoc(doc(db,'active_runs',currentUser.uid));
@@ -552,7 +543,6 @@ async function enterApp() {
         document.getElementById('qr-hint-start').style.display='none';
         document.getElementById('qr-hint-goal').style.display='block';
       } else {
-        // スタート記録が見つからない
         showToast('スタート記録が見つかりません。再度スタートQRを読み取ってください','err');
         document.getElementById('screen-timer').classList.remove('active');
         document.getElementById('screen-home').classList.add('active');
@@ -560,7 +550,6 @@ async function enterApp() {
         return;
       }
     } catch(e) {
-      console.error('restore error:',e);
       if(e.message==='timeout') {
         showToast('通信に時間がかかっています。電波の良い場所で再度お試しください','err');
       } else {
@@ -582,7 +571,7 @@ async function enterApp() {
   }
 }
 
-// ── Camera QR Scanner (Html5Qrcode) ──
+// ── Camera QR Scanner ──
 let html5QrCode = null;
 let currentScanMode = null;
 
@@ -591,31 +580,13 @@ window.openCamera = async (mode) => {
   const label = document.getElementById('camera-label');
   label.textContent = mode === 'start' ? '🏁 スタートQRを読み取り中' : '🏆 ゴールQRを読み取り中';
   document.getElementById('camera-modal').style.display = 'block';
-
-  // 既存インスタンスをクリア
-  if(html5QrCode) {
-    try { await html5QrCode.stop(); } catch(e){}
-    html5QrCode = null;
-  }
+  if(html5QrCode) { try { await html5QrCode.stop(); } catch(e){} html5QrCode = null; }
   document.getElementById('qr-reader').innerHTML = '';
-
   html5QrCode = new Html5Qrcode('qr-reader');
-  const config = {
-    fps: 10,
-    qrbox: { width: 220, height: 220 },
-    aspectRatio: 1.0,
-    supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
-  };
-
+  const config = { fps:10, qrbox:{width:220,height:220}, aspectRatio:1.0, supportedScanTypes:[Html5QrcodeScanType.SCAN_TYPE_CAMERA] };
   try {
-    await html5QrCode.start(
-      { facingMode: 'environment' },
-      config,
-      (decodedText) => { handleQRResult(decodedText); },
-      (errorMessage) => { /* スキャン中エラーは無視 */ }
-    );
+    await html5QrCode.start({ facingMode:'environment' }, config, (decodedText) => { handleQRResult(decodedText); }, () => {});
   } catch(e) {
-    console.error('Camera error:', e);
     closeCamera();
     showToast('カメラを起動できませんでした。設定でカメラを許可してください','err');
   }
@@ -626,8 +597,7 @@ function handleQRResult(url) {
     const action = url.includes('action=start') ? 'start' : 'goal';
     if(action === currentScanMode) {
       closeCamera();
-      if(action === 'start') { timerStart(); }
-      else { timerGoal(); }
+      if(action === 'start') { timerStart(); } else { timerGoal(); }
     } else {
       showToast(action==='start' ? '⚠️ これはスタートQRです' : '⚠️ これはゴールQRです','err');
     }
@@ -637,10 +607,7 @@ function handleQRResult(url) {
 }
 
 window.closeCamera = async () => {
-  if(html5QrCode) {
-    try { await html5QrCode.stop(); } catch(e){}
-    html5QrCode = null;
-  }
+  if(html5QrCode) { try { await html5QrCode.stop(); } catch(e){} html5QrCode = null; }
   document.getElementById('camera-modal').style.display = 'none';
 };
 
@@ -650,7 +617,6 @@ window.authSwitch = (tab,el) => {
   document.getElementById('f-login').style.display    = tab==='login'    ? 'block':'none';
   document.getElementById('f-register').style.display = tab==='register' ? 'block':'none';
 };
-
 window.doRegister = async () => {
   const dog=document.getElementById('r-dog').value.trim();
   const name=document.getElementById('r-name').value.trim()||'オーナー';
@@ -673,7 +639,6 @@ window.doRegister = async () => {
     btn.disabled=false; btn.textContent='アカウント作成';
   }
 };
-
 window.doLogin = async () => {
   const email=document.getElementById('l-email').value.trim();
   const pass=document.getElementById('l-pass').value;
@@ -691,7 +656,6 @@ window.doLogin = async () => {
     btn.disabled=false; btn.textContent='ログイン';
   }
 };
-
 window.doLogout = async () => {
   if(!confirm('ログアウトしますか？')) return;
   await signOut(auth); showToast('ログアウトしました','info');
@@ -726,16 +690,13 @@ window.timerStart = async () => {
   timerIv=setInterval(()=>{document.getElementById('t-display').textContent=fmt(Date.now()-startTs);},100);
   showToast('🏁 スタート！走れ！');
 };
-
 window.timerGoal = async () => {
   if(timerState==='wait'){showToast('先にスタートQRを読み取ってください','err');return;}
   if(timerState==='finished'){showToast('ゴール済みです。「もう一度走る」を押してください','info');return;}
   timerState='finished';
   clearInterval(timerIv);
-
   const elapsed = startTs ? Date.now()-startTs : 0;
   const timeStr = fmt(elapsed);
-
   document.getElementById('qr-hint-goal').style.display='none';
   document.getElementById('qr-instruction').style.display='none';
   document.getElementById('t-label').textContent='ゴール！🎉';
@@ -746,36 +707,16 @@ window.timerGoal = async () => {
   document.getElementById('s-fin').className='step done';
   document.getElementById('fb-time').textContent=timeStr;
   document.getElementById('finish-box').classList.add('show');
-
-  // userProfileがない場合はFirestoreから再取得
   if(!userProfile && currentUser) {
-    try {
-      const snap = await getDoc(doc(db,'users',currentUser.uid));
-      if(snap.exists()) userProfile = snap.data();
-    } catch(e){ console.error(e); }
+    try { const snap=await getDoc(doc(db,'users',currentUser.uid)); if(snap.exists()) userProfile=snap.data(); } catch(e){}
   }
-
-  // Firestoreに保存
   if(currentUser && userProfile && elapsed > 0) {
     try {
-      await addDoc(collection(db,'runs'),{
-        uid:currentUser.uid,
-        dog:userProfile.dog,
-        name:userProfile.name,
-        cat:userProfile.cat,
-        timeMs:elapsed,
-        month:monthKey(),
-        createdAt:serverTimestamp()
-      });
+      await addDoc(collection(db,'runs'),{uid:currentUser.uid,dog:userProfile.dog,name:userProfile.name,cat:userProfile.cat,timeMs:elapsed,month:monthKey(),createdAt:serverTimestamp()});
       showToast(`🎉 ゴール！ ${timeStr} を記録しました`);
       await deleteDoc(doc(db,'active_runs',currentUser.uid));
-    } catch(e){
-      console.error('save error:',e);
-      showToast('記録の保存に失敗しました','err');
-    }
+    } catch(e){ showToast('記録の保存に失敗しました','err'); }
   }
-
-  // 順位計算
   try {
     const q=query(collection(db,'runs'),where('month','==',monthKey()));
     const snap=await getDocs(q);
@@ -786,11 +727,8 @@ window.timerGoal = async () => {
     const rank=times.indexOf(myBest)+1;
     document.getElementById('fb-rank').textContent=`今月 ${rank}位 ／ ${times.length}人中`;
   } catch(e){}
-
-  loadRecords();
-  loadHome();
+  loadRecords(); loadHome();
 };
-
 window.resetTimer = () => {
   timerState='wait'; startTs=null; clearInterval(timerIv);
   if(currentUser){deleteDoc(doc(db,'active_runs',currentUser.uid)).catch(()=>{});}
@@ -805,7 +743,6 @@ window.resetTimer = () => {
   document.getElementById('qr-hint-start').style.display='block';
   document.getElementById('qr-hint-goal').style.display='none';
 };
-
 function updateTimerUI() {
   if(!userProfile) return;
   document.getElementById('t-dog').textContent=userProfile.dog;
@@ -825,10 +762,7 @@ window.openEdit = () => {
   document.getElementById('edit-modal').style.display='block';
   document.body.style.overflow='hidden';
 };
-window.closeEdit = () => {
-  document.getElementById('edit-modal').style.display='none';
-  document.body.style.overflow='';
-};
+window.closeEdit = () => { document.getElementById('edit-modal').style.display='none'; document.body.style.overflow=''; };
 window.saveProfile = async () => {
   const dog=document.getElementById('e-dog').value.trim();
   const name=document.getElementById('e-name').value.trim()||'オーナー';
@@ -845,15 +779,9 @@ window.saveProfile = async () => {
   if((emailChanged||passChanged)&&!currentPass){errEl.textContent='メールまたはパスワードを変更する場合は現在のパスワードを入力してください';errEl.style.display='block';return;}
   btn.disabled=true; btn.textContent='保存中...';
   try {
-    if(emailChanged||passChanged){
-      const credential=EmailAuthProvider.credential(currentUser.email,currentPass);
-      await reauthenticateWithCredential(currentUser,credential);
-    }
+    if(emailChanged||passChanged){ const credential=EmailAuthProvider.credential(currentUser.email,currentPass); await reauthenticateWithCredential(currentUser,credential); }
     if(emailChanged) await updateEmail(currentUser,email);
-    if(passChanged){
-      if(newPass.length<6){errEl.textContent='パスワードは6文字以上にしてください';errEl.style.display='block';btn.disabled=false;btn.textContent='変更を保存';return;}
-      await updatePassword(currentUser,newPass);
-    }
+    if(passChanged){ if(newPass.length<6){errEl.textContent='パスワードは6文字以上にしてください';errEl.style.display='block';btn.disabled=false;btn.textContent='変更を保存';return;} await updatePassword(currentUser,newPass); }
     await updateDoc(doc(db,'users',currentUser.uid),{dog,name,cat,email});
     userProfile={...userProfile,dog,name,cat,email};
     closeEdit(); updateTimerUI(); loadRecords();
@@ -863,10 +791,8 @@ window.saveProfile = async () => {
     errEl.textContent=msgs[e.code]||'エラー: '+e.message; errEl.style.display='block';
   } finally { btn.disabled=false; btn.textContent='変更を保存'; }
 };
-
 window.uploadPhoto = async (input) => {
-  const file=input.files[0];
-  if(!file) return;
+  const file=input.files[0]; if(!file) return;
   if(file.size>5*1024*1024){showToast('画像は5MB以下にしてください','err');return;}
   showToast('アップロード中...','info');
   try {
@@ -874,16 +800,13 @@ window.uploadPhoto = async (input) => {
     await uploadBytes(storageRef,file);
     const url=await getDownloadURL(storageRef);
     await updateDoc(doc(db,'users',currentUser.uid),{photoURL:url});
-    userProfile.photoURL=url;
-    updateAvatarUI(url);
+    userProfile.photoURL=url; updateAvatarUI(url);
     showToast('📸 写真を更新しました！');
-  } catch(e){showToast('アップロードに失敗しました','err');console.error(e);}
+  } catch(e){showToast('アップロードに失敗しました','err');}
 };
-
 function updateAvatarUI(url) {
   if(!url) return;
-  const img=document.getElementById('p-av-img');
-  const emoji=document.getElementById('p-av-emoji');
+  const img=document.getElementById('p-av-img'); const emoji=document.getElementById('p-av-emoji');
   if(img&&emoji){img.src=url;img.style.display='block';emoji.style.display='none';}
 }
 
@@ -897,18 +820,12 @@ async function loadHome() {
     const q=query(collection(db,'runs'),where('month','==',mk));
     const snap=await getDocs(q);
     const bestMap={};const countMap={};const infoMap={};let totalRuns=0;
-    snap.forEach(d=>{
-      const r=d.data();totalRuns++;
-      if(!bestMap[r.uid]||r.timeMs<bestMap[r.uid]){bestMap[r.uid]=r.timeMs;infoMap[r.uid]={dog:r.dog,name:r.name,cat:r.cat};}
-      countMap[r.uid]=(countMap[r.uid]||0)+1;
-    });
+    snap.forEach(d=>{ const r=d.data();totalRuns++; if(!bestMap[r.uid]||r.timeMs<bestMap[r.uid]){bestMap[r.uid]=r.timeMs;infoMap[r.uid]={dog:r.dog,name:r.name,cat:r.cat};} countMap[r.uid]=(countMap[r.uid]||0)+1; });
     const entries=Object.entries(bestMap).map(([uid,t])=>({uid,timeMs:t,...infoMap[uid],count:countMap[uid]}));
     entries.sort((a,b)=>a.timeMs-b.timeMs);
     const top5=entries.slice(0,5);
     const photoMap={};
-    await Promise.all(top5.map(async e=>{
-      try{const us=await getDoc(doc(db,'users',e.uid));if(us.exists()&&us.data().photoURL)photoMap[e.uid]=us.data().photoURL;}catch(err){}
-    }));
+    await Promise.all(top5.map(async e=>{ try{const us=await getDoc(doc(db,'users',e.uid));if(us.exists()&&us.data().photoURL)photoMap[e.uid]=us.data().photoURL;}catch(err){} }));
     document.getElementById('h-total').textContent=entries.length;
     document.getElementById('h-runs').textContent=totalRuns;
     document.getElementById('h-best').textContent=entries.length?fmt(entries[0].timeMs):'--:--';
@@ -932,32 +849,19 @@ async function loadRecords() {
   document.getElementById('p-owner').textContent=userProfile.name&&userProfile.name!=='オーナー'?`👤 ${userProfile.name}`:'';
   document.getElementById('p-cat').textContent=userProfile.cat;
   if(userProfile.photoURL) updateAvatarUI(userProfile.photoURL);
-
   const d=getOffsetDate(recordMonthOffset);
-  const mk=monthKey(d);
-  const ml=monthLabel(d);
+  const mk=monthKey(d); const ml=monthLabel(d);
   document.getElementById('rec-month-tag').textContent=ml;
   document.getElementById('rec-month-nav').textContent=ml;
-  // 今月以降は「›」を薄くする
   document.getElementById('rec-next-btn').style.opacity = recordMonthOffset >= 0 ? '0.3' : '1';
-
   try {
     const q=query(collection(db,'runs'),where('uid','==',currentUser.uid),where('month','==',mk));
     const snap=await getDocs(q);
     const runs=[];
     snap.forEach(d=>runs.push({id:d.id,...d.data()}));
-    runs.sort((a,b)=>{
-      const ta=a.createdAt?.toMillis?a.createdAt.toMillis():0;
-      const tb=b.createdAt?.toMillis?b.createdAt.toMillis():0;
-      return tb-ta;
-    });
+    runs.sort((a,b)=>{ const ta=a.createdAt?.toMillis?a.createdAt.toMillis():0; const tb=b.createdAt?.toMillis?b.createdAt.toMillis():0; return tb-ta; });
     document.getElementById('p-total').textContent=runs.length;
-    if(!runs.length){
-      document.getElementById('p-best').textContent='--:--';
-      document.getElementById('p-rank').textContent='-';
-      document.getElementById('rec-list').innerHTML='<div class="empty"><div class="ei">🐾</div>今月はまだ走行記録がありません</div>';
-      return;
-    }
+    if(!runs.length){ document.getElementById('p-best').textContent='--:--'; document.getElementById('p-rank').textContent='-'; document.getElementById('rec-list').innerHTML='<div class="empty"><div class="ei">🐾</div>今月はまだ走行記録がありません</div>'; return; }
     const myBest=Math.min(...runs.map(r=>r.timeMs));
     document.getElementById('p-best').textContent=fmt(myBest);
     const allQ=query(collection(db,'runs'),where('month','==',mk));
@@ -967,16 +871,9 @@ async function loadRecords() {
     const times=Object.values(bestMap).sort((a,b)=>a-b);
     const myRank=times.indexOf(myBest)+1;
     document.getElementById('p-rank').textContent=`${myRank}位`;
-    const allRuns=[];
-    allSnap.forEach(d=>allRuns.push(d.data()));
-    allRuns.sort((a,b)=>a.timeMs-b.timeMs);
+    const allRuns=[]; allSnap.forEach(d=>allRuns.push(d.data())); allRuns.sort((a,b)=>a.timeMs-b.timeMs);
     const mons=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-    function badge(rank){
-      if(rank===1) return '<span class="rank-badge bg-gold">🥇 1位</span>';
-      if(rank===2) return '<span class="rank-badge bg-silver">🥈 2位</span>';
-      if(rank===3) return '<span class="rank-badge bg-bronze">🥉 3位</span>';
-      return `<span class="rank-badge bg-norm">${rank}位</span>`;
-    }
+    function badge(rank){ if(rank===1) return '<span class="rank-badge bg-gold">🥇 1位</span>'; if(rank===2) return '<span class="rank-badge bg-silver">🥈 2位</span>'; if(rank===3) return '<span class="rank-badge bg-bronze">🥉 3位</span>'; return `<span class="rank-badge bg-norm">${rank}位</span>`; }
     document.getElementById('rec-list').innerHTML=runs.map((r,i)=>{
       const d=r.createdAt?.toDate?r.createdAt.toDate():new Date();
       const isPB=r.timeMs===myBest;
@@ -987,11 +884,7 @@ async function loadRecords() {
 }
 
 // ── Ranking ──
-window.setCat = (cat,el) => {
-  catFilter=cat;
-  document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
-  loadRanking();
-};
+window.setCat = (cat,el) => { catFilter=cat; document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); loadRanking(); };
 async function loadRanking() {
   if(!currentUser) return;
   const rd=getOffsetDate(rankMonthOffset);
@@ -1004,18 +897,11 @@ async function loadRanking() {
     const q=query(collection(db,'runs'),where('month','==',mk));
     const snap=await getDocs(q);
     const bestMap={};const countMap={};const infoMap={};
-    snap.forEach(d=>{
-      const r=d.data();
-      if(catFilter!=='全て'&&r.cat!==catFilter) return;
-      if(!bestMap[r.uid]||r.timeMs<bestMap[r.uid]){bestMap[r.uid]=r.timeMs;infoMap[r.uid]={dog:r.dog,name:r.name,cat:r.cat};}
-      countMap[r.uid]=(countMap[r.uid]||0)+1;
-    });
+    snap.forEach(d=>{ const r=d.data(); if(catFilter!=='全て'&&r.cat!==catFilter) return; if(!bestMap[r.uid]||r.timeMs<bestMap[r.uid]){bestMap[r.uid]=r.timeMs;infoMap[r.uid]={dog:r.dog,name:r.name,cat:r.cat};} countMap[r.uid]=(countMap[r.uid]||0)+1; });
     const entries=Object.entries(bestMap).map(([uid,t])=>({uid,timeMs:t,...infoMap[uid],count:countMap[uid]}));
     entries.sort((a,b)=>a.timeMs-b.timeMs);
     const photoMap={};
-    await Promise.all(entries.map(async e=>{
-      try{const us=await getDoc(doc(db,'users',e.uid));if(us.exists()&&us.data().photoURL)photoMap[e.uid]=us.data().photoURL;}catch(err){}
-    }));
+    await Promise.all(entries.map(async e=>{ try{const us=await getDoc(doc(db,'users',e.uid));if(us.exists()&&us.data().photoURL)photoMap[e.uid]=us.data().photoURL;}catch(err){} }));
     const medals=['🥇','🥈','🥉'];
     const list=document.getElementById('rank-list');
     if(!entries.length){list.innerHTML='<div class="empty"><div class="ei">🐾</div>まだ記録がありません</div>';return;}
